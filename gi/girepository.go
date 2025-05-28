@@ -350,11 +350,3 @@ func (info *ArgInfo) c() *C.GIArgInfo {
 }
 
 func (info *ArgInfo) AsGIArgInfo() *ArgInfo { return info }
-
-func (tl *Typelib) Ref() {
-	C.gi_typelib_ref(tl.c())
-}
-
-func (tl *Typelib) Unref() {
-	C.gi_typelib_unref(tl.c())
-}

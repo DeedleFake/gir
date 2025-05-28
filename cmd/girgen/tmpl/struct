@@ -18,7 +18,11 @@
 					{{.GetName}} any,
 				{{end -}}
 			) {
-				panic("Not implemented.")
+				{{- if .GetNArgs}}
+					panic("Not implemented.")
+				{{else}}
+					C.{{$.MethodName $.Info.GetName .GetName}}(s.c())
+				{{end -}}
 			}
 		{{else}}
 			func {{$.Info.GetName}}{{toCamelCase .GetName}}(

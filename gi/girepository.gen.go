@@ -76,3 +76,29 @@ type Typelib struct {
 func (s *Typelib) c() *C.GITypelib {
 	return (*C.GITypelib)(unsafe.Pointer(s))
 }
+
+func TypelibNewFromBytes(
+	bytes any,
+) {
+	panic("Not implemented.")
+}
+
+func (s *Typelib) GetNamespace() {
+	C.gi_typelib_get_namespace(s.c())
+}
+
+func (s *Typelib) Ref() {
+	C.gi_typelib_ref(s.c())
+}
+
+func (s *Typelib) Symbol(
+	symbol_name any,
+
+	symbol any,
+) {
+	panic("Not implemented.")
+}
+
+func (s *Typelib) Unref() {
+	C.gi_typelib_unref(s.c())
+}
