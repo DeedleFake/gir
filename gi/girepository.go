@@ -114,10 +114,10 @@ func (info *BaseInfo) GetName() string {
 
 func (info *BaseInfo) IterateAttributes() iter.Seq2[string, string] {
 	return func(yield func(string, string) bool) {
-		var iterator C.GIAttributeIter
+		var iterator AttributeIter
 		for {
 			var name, val *C.char
-			ok := C.gi_base_info_iterate_attributes(info.c(), &iterator, &name, &val)
+			ok := C.gi_base_info_iterate_attributes(info.c(), iterator.c(), &name, &val)
 			if ok == 0 || !yield(C.GoString(name), C.GoString(val)) {
 				return
 			}

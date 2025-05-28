@@ -13,6 +13,61 @@ import (
 	"unsafe"
 )
 
+type AttributeIter struct {
+	_ structs.HostLayout
+	_ [40]byte
+
+	// data
+
+	// _dummy
+
+}
+
+func (s *AttributeIter) c() *C.GIAttributeIter {
+	return (*C.GIAttributeIter)(unsafe.Pointer(s))
+}
+
+type BaseInfoClass struct {
+	_ structs.HostLayout
+	_ [0]byte
+}
+
+func (s *BaseInfoClass) c() *C.GIBaseInfoClass {
+	return (*C.GIBaseInfoClass)(unsafe.Pointer(s))
+}
+
+type BaseInfoStack struct {
+	_ structs.HostLayout
+	_ [96]byte
+
+	// parent_instance
+
+	// dummy0
+
+	// dummy1
+
+	// dummy2
+
+	// dummy3
+
+}
+
+func (s *BaseInfoStack) c() *C.GIBaseInfoStack {
+	return (*C.GIBaseInfoStack)(unsafe.Pointer(s))
+}
+
+type RepositoryClass struct {
+	_ structs.HostLayout
+	_ [136]byte
+
+	// parent_class
+
+}
+
+func (s *RepositoryClass) c() *C.GIRepositoryClass {
+	return (*C.GIRepositoryClass)(unsafe.Pointer(s))
+}
+
 type Typelib struct {
 	_ structs.HostLayout
 	_ [0]byte
