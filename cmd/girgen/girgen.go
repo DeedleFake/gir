@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"text/template"
 
@@ -57,16 +58,22 @@ func readConfig(path string) *Config {
 	return config
 }
 
+type BaseInfoer interface {
+	GetName() string
+	AsGIBaseInfo() *gi.BaseInfo
+}
+
 type Generator struct {
 	w io.Writer
 
-	Config *Config
-	Repo   *gi.Repository
-	Info   any
+	Config        *Config
+	Repo          *gi.Repository
+	Type, Element BaseInfoer
 }
 
-func (gen Generator) Generate(name string, info any) (string, error) {
-	gen.Info = info
+func (gen Generator) Generate(name string, t, element BaseInfoer) (string, error) {
+	gen.Type = t
+	gen.Element = element
 	return "", tmpl.ExecuteTemplate(gen.w, name, gen)
 }
 
@@ -76,7 +83,7 @@ func (gen Generator) CPrefix() string {
 }
 
 func (gen Generator) CName() (string, error) {
-	info := gen.Info.(interface{ AsGIBaseInfo() *gi.BaseInfo }).AsGIBaseInfo()
+	info := gen.Type.AsGIBaseInfo()
 
 	if info, ok := gi.TypeRegisteredTypeInfo.Check(info.AsGTypeInstance()); ok {
 		return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName()), nil
@@ -91,6 +98,18 @@ func (gen Generator) CName() (string, error) {
 
 func (gen Generator) MethodName(tname, mname string) string {
 	return fmt.Sprintf("%v_%v_%v", strings.ToLower(gen.CPrefix()), util.ToSnakeCase(tname), mname)
+}
+
+func (gen Generator) Arguments() (string, error) {
+	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
+	raw := slices.Collect(callable.GetArgs())
+
+	fmt.Fprintln(os.Stderr, gen.MethodName(gen.Type.GetName(), gen.Element.GetName()))
+	for i, arg := range raw {
+		fmt.Fprintf(os.Stderr, "\t%v -> %q\n", i, arg.GetName())
+	}
+
+	return "", nil
 }
 
 func main() {
@@ -119,7 +138,7 @@ func main() {
 		w:      &buf,
 		Config: config,
 		Repo:   r,
-	}.Generate("file", nil)
+	}.Generate("file", nil, nil)
 	if err != nil {
 		slog.Error("failed to execute template", "err", err)
 		os.Exit(1)

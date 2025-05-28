@@ -1,29 +1,17 @@
-{{if not .Info.IsForeign}}
-	type {{.Info.GetName}} struct {
+{{if not .Type.IsForeign}}
+	type {{.Type.GetName}} struct {
 		_ structs.HostLayout
-		_ [{{.Info.GetSize}}]byte
-		{{range .Info.GetFields}}
+		_ [{{.Type.GetSize}}]byte
+		{{range .Type.GetFields}}
 			// {{.GetName}}
 		{{end}}
 	}
 
-	func (s *{{.Info.GetName}}) c() *C.{{.CName}} {
+	func (s *{{.Type.GetName}}) c() *C.{{.CName}} {
 		return (*C.{{.CName}})(unsafe.Pointer(s))
 	}
 
-	{{range .Info.GetMethods}}
-		{{if .IsMethod}}
-			func (s *{{$.Info.GetName}}) {{toCamelCase .GetName}}({{range .GetArgs}}{{.GetName}} any,{{end}}) {
-				{{- if .GetNArgs}}
-					panic("Not implemented.")
-				{{else}}
-					C.{{$.MethodName $.Info.GetName .GetName}}(s.c())
-				{{end -}}
-			}
-		{{else}}
-			func {{$.Info.GetName}}{{toCamelCase .GetName}}({{range .GetArgs}}{{.GetName}} any,{{end -}}) {
-				panic("Not implemented.")
-			}
-		{{end}}
+	{{range .Type.GetMethods}}
+		{{$.Generate "func" $.Type .}}
 	{{end}}
 {{end}}
