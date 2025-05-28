@@ -1,27 +1,37 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log/slog"
+	"os"
 
 	"deedles.dev/gir/gi"
 )
 
 func main() {
-	r := gi.RepositoryNew()
-	tl, err := r.Require("GIRepository", "3.0", gi.RepositoryLoadFlagNone)
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, "Usage: girgen < config > output.go")
+	}
+	flag.Parse()
+
+	config, err := ParseConfig(os.Stdin)
 	if err != nil {
-		panic(err)
+		slog.Error("failed to parse config", "err", err)
+		os.Exit(1)
+	}
+
+	r := gi.RepositoryNew()
+
+	tl, err := r.Require(config.Namespace, config.Version, gi.RepositoryLoadFlagNone)
+	if err != nil {
+		slog.Error("failed to open typelib", "namespace", config.Namespace, "version", config.Version, "err", err)
+		os.Exit(1)
 	}
 	defer tl.Unref()
 
-	for info := range r.GetInfos("GIRepository") {
-		defer info.Unref()
-		fmt.Println(info.GetName())
-		if info, ok := gi.TypeObjectInfo.Check(info.AsGTypeInstance()); ok {
-			for method := range info.GetMethods() {
-				defer method.Unref()
-				fmt.Printf("\t%v\n", method.GetName())
-			}
-		}
+	for info := range r.GetInfos(config.Namespace) {
+		fmt.Printf("%q\n", info.GetName())
+		info.Unref()
 	}
 }
