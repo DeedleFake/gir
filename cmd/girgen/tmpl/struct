@@ -1,6 +1,4 @@
 {{if not .Info.IsForeign}}
-	var Type{{.Info.GetName}} = g.ToType[{{.Info.GetName}}](uint64(C.{{.MethodName .Info.GetName "get_type"}}()))
-
 	type {{.Info.GetName}} struct {
 		_ structs.HostLayout
 		_ [{{.Info.GetSize}}]byte
