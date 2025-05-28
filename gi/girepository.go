@@ -87,6 +87,13 @@ func (r *Repository) GetInfos(namespace string) iter.Seq[*BaseInfo] {
 	}
 }
 
+func (r *Repository) GetCPrefix(namespace string) string {
+	cnamespace := C.CString(namespace)
+	defer C.free(unsafe.Pointer(cnamespace))
+
+	return C.GoString(C.gi_repository_get_c_prefix(r.c(), cnamespace))
+}
+
 var TypeBaseInfo = g.ToType[BaseInfo](uint64(C.gi_base_info_get_type()))
 
 type BaseInfo struct {

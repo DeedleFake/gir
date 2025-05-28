@@ -5,8 +5,10 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
+	"strings"
 	"text/template"
 
 	"deedles.dev/gir/gi"
@@ -55,6 +57,42 @@ func readConfig(path string) *Config {
 	return config
 }
 
+type Generator struct {
+	w io.Writer
+
+	Config *Config
+	Repo   *gi.Repository
+	Info   any
+}
+
+func (gen Generator) Generate(name string, info any) (string, error) {
+	gen.Info = info
+	return "", tmpl.ExecuteTemplate(gen.w, name, gen)
+}
+
+func (gen Generator) CPrefix() string {
+	prefix, _, _ := strings.Cut(gen.Repo.GetCPrefix(gen.Config.Namespace), ",")
+	return prefix
+}
+
+func (gen Generator) CName() (string, error) {
+	info := gen.Info.(interface{ AsGIBaseInfo() *gi.BaseInfo }).AsGIBaseInfo()
+
+	if info, ok := gi.TypeRegisteredTypeInfo.Check(info.AsGTypeInstance()); ok {
+		return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName()), nil
+	}
+
+	if info, ok := gi.TypeCallableInfo.Check(info.AsGTypeInstance()); ok {
+		return fmt.Sprintf("%v_%v", strings.ToLower(gen.CPrefix()), info.GetName()), nil
+	}
+
+	return "", fmt.Errorf("don't know how to get C name of type %q", info.TypeName())
+}
+
+func (gen Generator) MethodName(tname, mname string) string {
+	return fmt.Sprintf("%v_%v_%v", strings.ToLower(gen.CPrefix()), util.ToSnakeCase(tname), mname)
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "Usage: girgen -o output.go config.gen")
@@ -77,10 +115,11 @@ func main() {
 	defer tl.Unref()
 
 	var buf bytes.Buffer
-	err = tmpl.ExecuteTemplate(&buf, "file", map[string]any{
-		"Config": config,
-		"Repo":   r,
-	})
+	_, err = Generator{
+		w:      &buf,
+		Config: config,
+		Repo:   r,
+	}.Generate("file", nil)
 	if err != nil {
 		slog.Error("failed to execute template", "err", err)
 		os.Exit(1)

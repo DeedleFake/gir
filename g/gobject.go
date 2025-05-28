@@ -56,12 +56,10 @@ func (t Type[T]) Cast(obj *TypeInstance) *T {
 
 func (t Type[T]) Check(obj *TypeInstance) (*T, bool) {
 	target := C.g_type_from_name(C.g_type_name_from_instance(obj.c()))
-	switch {
-	case C.g_type_is_a(t.c(), target) == 0, C.g_type_is_a(target, t.c()) == 0:
+	if C.g_type_is_a(t.c(), target) == 0 && C.g_type_is_a(target, t.c()) == 0 {
 		return nil, false
-	default:
-		return (*T)(unsafe.Pointer(obj)), true
 	}
+	return (*T)(unsafe.Pointer(obj)), true
 }
 
 type TypeClass struct {
@@ -75,6 +73,10 @@ func (tc *TypeClass) c() *C.GTypeClass {
 
 func (tc *TypeClass) AsGTypeClass() *TypeClass { return tc }
 
+func (tc *TypeClass) TypeName() string {
+	return C.GoString(C.g_type_name_from_class(tc.c()))
+}
+
 type TypeInstance struct {
 	_ structs.HostLayout
 	_ [unsafe.Sizeof(*new(C.GTypeInstance))]byte
@@ -85,6 +87,10 @@ func (ti *TypeInstance) c() *C.GTypeInstance {
 }
 
 func (ti *TypeInstance) AsGTypeInstance() *TypeInstance { return ti }
+
+func (ti *TypeInstance) TypeName() string {
+	return C.GoString(C.g_type_name_from_instance(ti.c()))
+}
 
 type ObjectClass struct {
 	_ structs.HostLayout

@@ -1,13 +1,15 @@
-{{if and (not .IsForeign) .GetTypeName}}
-	type {{.GetName}} struct {
+{{if not .Info.IsForeign}}
+	var Type{{.Info.GetName}} = g.ToType[{{.Info.GetName}}](uint64(C.{{.MethodName .Info.GetName "get_type"}}()))
+
+	type {{.Info.GetName}} struct {
 		_ structs.HostLayout
-		_ [{{.GetSize}}]byte
-		{{range .GetFields}}
+		_ [{{.Info.GetSize}}]byte
+		{{range .Info.GetFields}}
 			// {{.GetName}}
 		{{end}}
 	}
 
-	func (s *{{.GetName}}) c() *C.{{.GetTypeName}} {
-		return (*C.{{.GetTypeName}})(unsafe.Pointer(s))
+	func (s *{{.Info.GetName}}) c() *C.{{.CName}} {
+		return (*C.{{.CName}})(unsafe.Pointer(s))
 	}
 {{end}}
