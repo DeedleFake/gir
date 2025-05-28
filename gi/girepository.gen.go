@@ -77,9 +77,7 @@ func (s *Typelib) c() *C.GITypelib {
 	return (*C.GITypelib)(unsafe.Pointer(s))
 }
 
-func TypelibNewFromBytes(
-	bytes any,
-) {
+func TypelibNewFromBytes(bytes any) {
 	panic("Not implemented.")
 }
 
@@ -91,11 +89,7 @@ func (s *Typelib) Ref() {
 	C.gi_typelib_ref(s.c())
 }
 
-func (s *Typelib) Symbol(
-	symbol_name any,
-
-	symbol any,
-) {
+func (s *Typelib) Symbol(symbol_name any, symbol any) {
 	panic("Not implemented.")
 }
 

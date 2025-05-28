@@ -13,11 +13,7 @@
 
 	{{range .Info.GetMethods}}
 		{{if .IsMethod}}
-			func (s *{{$.Info.GetName}}) {{toCamelCase .GetName}}(
-				{{- range .GetArgs}}
-					{{.GetName}} any,
-				{{end -}}
-			) {
+			func (s *{{$.Info.GetName}}) {{toCamelCase .GetName}}({{range .GetArgs}}{{.GetName}} any,{{end}}) {
 				{{- if .GetNArgs}}
 					panic("Not implemented.")
 				{{else}}
@@ -25,11 +21,7 @@
 				{{end -}}
 			}
 		{{else}}
-			func {{$.Info.GetName}}{{toCamelCase .GetName}}(
-				{{- range .GetArgs}}
-					{{.GetName}} any,
-				{{end -}}
-			) {
+			func {{$.Info.GetName}}{{toCamelCase .GetName}}({{range .GetArgs}}{{.GetName}} any,{{end -}}) {
 				panic("Not implemented.")
 			}
 		{{end}}
