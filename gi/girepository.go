@@ -161,6 +161,34 @@ func (info *FunctionInfo) c() *C.GIFunctionInfo {
 
 func (info *FunctionInfo) AsGIFunctionInfo() *FunctionInfo { return info }
 
+type FunctionInfoFlags int
+
+const (
+	FunctionInfoFlagsNone FunctionInfoFlags = 0
+	FunctionIsMethod      FunctionInfoFlags = 1 << (iota - 1)
+	FunctionIsConstructor
+	FunctionIsGetter
+	FunctionIsSetter
+	FunctionWrapsVFunc
+	FunctionIsAsync
+)
+
+func (info *FunctionInfo) GetFlags() FunctionInfoFlags {
+	return FunctionInfoFlags(C.gi_function_info_get_flags(info.c()))
+}
+
+func (info *FunctionInfo) IsMethod() bool {
+	return info.GetFlags()&FunctionIsMethod != 0
+}
+
+func (info *FunctionInfo) IsConstructor() bool {
+	return info.GetFlags()&FunctionIsConstructor != 0
+}
+
+func (info *FunctionInfo) IsAsync() bool {
+	return info.GetFlags()&FunctionIsAsync != 0
+}
+
 var TypeConstantInfo = g.ToType[ConstantInfo](uint64(C.gi_constant_info_get_type()))
 
 type ConstantInfo struct {
