@@ -1,6 +1,10 @@
 package util
 
-import "iter"
+import (
+	"bufio"
+	"io"
+	"iter"
+)
 
 func Pairs[T any](seq iter.Seq[T]) iter.Seq2[T, T] {
 	return func(yield func(T, T) bool) {
@@ -18,6 +22,20 @@ func Pairs[T any](seq iter.Seq[T]) iter.Seq2[T, T] {
 		}
 		if prev != nil {
 			panic("odd length of paris")
+		}
+	}
+}
+
+func Lines(r io.Reader) iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			if !yield(s.Text(), nil) {
+				return
+			}
+		}
+		if s.Err() != nil {
+			yield("", s.Err())
 		}
 	}
 }
