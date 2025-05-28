@@ -147,6 +147,33 @@ func (info *CallableInfo) c() *C.GICallableInfo {
 
 func (info *CallableInfo) AsGICallableInfo() *CallableInfo { return info }
 
+func (info *CallableInfo) IsMethod() bool {
+	return C.gi_callable_info_is_method(info.c()) != 0
+}
+
+func (info *CallableInfo) IsAsync() bool {
+	return C.gi_callable_info_is_async(info.c()) != 0
+}
+
+func (info *CallableInfo) GetNArgs() uint {
+	return uint(C.gi_callable_info_get_n_args(info.c()))
+}
+
+func (info *CallableInfo) GetArg(index uint) *ArgInfo {
+	return (*ArgInfo)(unsafe.Pointer(C.gi_callable_info_get_arg(info.c(), C.uint(index))))
+}
+
+func (info *CallableInfo) GetArgs() iter.Seq[*ArgInfo] {
+	return func(yield func(*ArgInfo) bool) {
+		n := info.GetNArgs()
+		for i := range n {
+			if !yield(info.GetArg(i)) {
+				return
+			}
+		}
+	}
+}
+
 var TypeFunctionInfo = g.ToType[FunctionInfo](uint64(C.gi_function_info_get_type()))
 
 type FunctionInfo struct {
@@ -175,18 +202,6 @@ const (
 
 func (info *FunctionInfo) GetFlags() FunctionInfoFlags {
 	return FunctionInfoFlags(C.gi_function_info_get_flags(info.c()))
-}
-
-func (info *FunctionInfo) IsMethod() bool {
-	return info.GetFlags()&FunctionIsMethod != 0
-}
-
-func (info *FunctionInfo) IsConstructor() bool {
-	return info.GetFlags()&FunctionIsConstructor != 0
-}
-
-func (info *FunctionInfo) IsAsync() bool {
-	return info.GetFlags()&FunctionIsAsync != 0
 }
 
 var TypeConstantInfo = g.ToType[ConstantInfo](uint64(C.gi_constant_info_get_type()))
@@ -323,6 +338,18 @@ type FieldInfo struct {
 func (info *FieldInfo) c() *C.GIFieldInfo {
 	return (*C.GIFieldInfo)(unsafe.Pointer(info))
 }
+
+type ArgInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [unsafe.Sizeof(*new(C.GIArgInfo)) - unsafe.Sizeof(*new(C.GIBaseInfo))]byte
+}
+
+func (info *ArgInfo) c() *C.GIArgInfo {
+	return (*C.GIArgInfo)(unsafe.Pointer(info))
+}
+
+func (info *ArgInfo) AsGIArgInfo() *ArgInfo { return info }
 
 func (tl *Typelib) Ref() {
 	C.gi_typelib_ref(tl.c())
