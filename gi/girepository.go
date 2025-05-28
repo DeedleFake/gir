@@ -1,5 +1,7 @@
 package gi
 
+//go:generate go tool girgen -o girepository.gen.go girepository.gen
+
 /*
 #cgo pkg-config: girepository-2.0
 
@@ -180,6 +182,10 @@ func (info *RegisteredTypeInfo) c() *C.GIRegisteredTypeInfo {
 
 func (info *RegisteredTypeInfo) AsGIRegisteredTypeInfo() *RegisteredTypeInfo { return info }
 
+func (info *RegisteredTypeInfo) GetTypeName() string {
+	return C.GoString(C.gi_registered_type_info_get_type_name(info.c()))
+}
+
 var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
 type ObjectInfo struct {
@@ -213,13 +219,74 @@ func (info *ObjectInfo) GetMethods() iter.Seq[*FunctionInfo] {
 	}
 }
 
-type Typelib struct {
+var TypeStructInfo = g.ToType[StructInfo](uint64(C.gi_struct_info_get_type()))
+
+type StructInfo struct {
 	_ structs.HostLayout
-	_ [unsafe.Sizeof(*new(C.GITypelib))]byte
+	RegisteredTypeInfo
+	_ [unsafe.Sizeof(*new(C.GIStructInfo)) - unsafe.Sizeof(*new(C.GIRegisteredTypeInfo))]byte
 }
 
-func (tl *Typelib) c() *C.GITypelib {
-	return (*C.GITypelib)(unsafe.Pointer(tl))
+func (info *StructInfo) c() *C.GIStructInfo {
+	return (*C.GIStructInfo)(unsafe.Pointer(info))
+}
+
+func (info *StructInfo) AsGIStructInfo() *StructInfo { return info }
+
+func (info *StructInfo) GetNMethods() uint {
+	return uint(C.gi_struct_info_get_n_methods(info.c()))
+}
+
+func (info *StructInfo) GetMethod(index uint) *FunctionInfo {
+	return (*FunctionInfo)(unsafe.Pointer(C.gi_struct_info_get_method(info.c(), C.uint(index))))
+}
+
+func (info *StructInfo) GetMethods() iter.Seq[*FunctionInfo] {
+	return func(yield func(*FunctionInfo) bool) {
+		n := info.GetNMethods()
+		for i := range n {
+			if !yield(info.GetMethod(i)) {
+				return
+			}
+		}
+	}
+}
+
+func (info *StructInfo) GetNFields() uint {
+	return uint(C.gi_struct_info_get_n_fields(info.c()))
+}
+
+func (info *StructInfo) GetField(index uint) *FieldInfo {
+	return (*FieldInfo)(unsafe.Pointer(C.gi_struct_info_get_field(info.c(), C.uint(index))))
+}
+
+func (info *StructInfo) GetFields() iter.Seq[*FieldInfo] {
+	return func(yield func(*FieldInfo) bool) {
+		n := info.GetNFields()
+		for i := range n {
+			if !yield(info.GetField(i)) {
+				return
+			}
+		}
+	}
+}
+
+func (info *StructInfo) GetSize() uint64 {
+	return uint64(C.gi_struct_info_get_size(info.c()))
+}
+
+func (info *StructInfo) IsForeign() bool {
+	return C.gi_struct_info_is_foreign(info.c()) != 0
+}
+
+type FieldInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [unsafe.Sizeof(*new(C.GIFieldInfo)) - unsafe.Sizeof(*new(C.GIBaseInfo))]byte
+}
+
+func (info *FieldInfo) c() *C.GIFieldInfo {
+	return (*C.GIFieldInfo)(unsafe.Pointer(info))
 }
 
 func (tl *Typelib) Ref() {

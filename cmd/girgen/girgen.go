@@ -5,32 +5,67 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"go/format"
 	"log/slog"
 	"os"
 	"text/template"
 
 	"deedles.dev/gir/gi"
+	"deedles.dev/gir/internal/util"
+	"golang.org/x/tools/imports"
 )
 
 var (
 	//go:embed tmpl
 	tmplFS embed.FS
 
-	tmpl = template.Must(template.ParseFS(tmplFS, "tmpl/*"))
+	tmpl = template.Must(template.New("root").Funcs(tmplFuncs).ParseFS(tmplFS, "tmpl/*"))
+
+	tmplFuncs = template.FuncMap{
+		"toCamelCase": util.ToCamelCase,
+		"toSnakeCase": util.ToSnakeCase,
+
+		"toCallable": func(info *gi.BaseInfo) *gi.CallableInfo {
+			c, _ := gi.TypeCallableInfo.Check(info.AsGTypeInstance())
+			return c
+		},
+
+		"toStruct": func(info *gi.BaseInfo) *gi.StructInfo {
+			c, _ := gi.TypeStructInfo.Check(info.AsGTypeInstance())
+			return c
+		},
+	}
 )
 
-func main() {
-	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "Usage: girgen < config > output.go")
-	}
-	flag.Parse()
+func readConfig(path string) *Config {
+	slog := slog.With("path", path)
 
-	config, err := ParseConfig(os.Stdin)
+	file, err := os.Open(path)
+	if err != nil {
+		slog.Error("failed to open config file", "err", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	config, err := ParseConfig(file)
 	if err != nil {
 		slog.Error("failed to parse config", "err", err)
 		os.Exit(1)
 	}
+
+	return config
+}
+
+func main() {
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, "Usage: girgen -o output.go config.gen")
+	}
+	output := flag.String("o", "", "output filename")
+	flag.Parse()
+	if flag.NArg() != 1 {
+		flag.Usage()
+		os.Exit(2)
+	}
+	config := readConfig(flag.Arg(0))
 
 	r := gi.RepositoryNew()
 
@@ -44,20 +79,26 @@ func main() {
 	var buf bytes.Buffer
 	err = tmpl.ExecuteTemplate(&buf, "file", map[string]any{
 		"Config": config,
+		"Repo":   r,
 	})
 	if err != nil {
 		slog.Error("failed to execute template", "err", err)
 		os.Exit(1)
 	}
 
-	formatted, err := format.Source(buf.Bytes())
+	formatted, err := imports.Process(*output, buf.Bytes(), nil)
 	if err != nil {
 		os.Stdout.Write(buf.Bytes())
 		slog.Error("failed to format output", "err", err)
 		os.Exit(1)
 	}
 
-	_, err = os.Stdout.Write(formatted)
+	if *output == "" {
+		os.Stdout.Write(formatted)
+		return
+	}
+
+	err = os.WriteFile(*output, formatted, 0644)
 	if err != nil {
 		slog.Error("failed to write output", "err", err)
 		os.Exit(1)

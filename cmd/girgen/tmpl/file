@@ -9,3 +9,11 @@ package {{.Config.Package}}
 {{end -}}
 */
 import "C"
+
+import()
+
+{{range (.Repo.GetInfos .Config.Namespace)}}
+	{{with toStruct .}}
+		{{template "struct" .}}
+	{{end}}
+{{end}}

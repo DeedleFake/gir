@@ -1,0 +1,13 @@
+{{if and (not .IsForeign) .GetTypeName}}
+	type {{.GetName}} struct {
+		_ structs.HostLayout
+		_ [{{.GetSize}}]byte
+		{{range .GetFields}}
+			// {{.GetName}}
+		{{end}}
+	}
+
+	func (s *{{.GetName}}) c() *C.{{.GetTypeName}} {
+		return (*C.{{.GetTypeName}})(unsafe.Pointer(s))
+	}
+{{end}}
