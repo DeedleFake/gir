@@ -1,3 +1,6 @@
 package gi
+
 namespace GIRepository
 version 3.0
+pkg-config girepository-2.0
+include <girepository/girepository.h>

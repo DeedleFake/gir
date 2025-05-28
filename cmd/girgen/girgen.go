@@ -1,12 +1,23 @@
 package main
 
 import (
+	"bytes"
+	"embed"
 	"flag"
 	"fmt"
+	"go/format"
 	"log/slog"
 	"os"
+	"text/template"
 
 	"deedles.dev/gir/gi"
+)
+
+var (
+	//go:embed tmpl
+	tmplFS embed.FS
+
+	tmpl = template.Must(template.ParseFS(tmplFS, "tmpl/*"))
 )
 
 func main() {
@@ -30,8 +41,25 @@ func main() {
 	}
 	defer tl.Unref()
 
-	for info := range r.GetInfos(config.Namespace) {
-		fmt.Printf("%q\n", info.GetName())
-		info.Unref()
+	var buf bytes.Buffer
+	err = tmpl.ExecuteTemplate(&buf, "file", map[string]any{
+		"Config": config,
+	})
+	if err != nil {
+		slog.Error("failed to execute template", "err", err)
+		os.Exit(1)
+	}
+
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
+		os.Stdout.Write(buf.Bytes())
+		slog.Error("failed to format output", "err", err)
+		os.Exit(1)
+	}
+
+	_, err = os.Stdout.Write(formatted)
+	if err != nil {
+		slog.Error("failed to write output", "err", err)
+		os.Exit(1)
 	}
 }
