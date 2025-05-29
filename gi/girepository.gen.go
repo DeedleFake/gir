@@ -71,7 +71,10 @@ func (s *Typelib) Ref() {
 }
 
 func (s *Typelib) Symbol(symbol_name string, symbol unsafe.Pointer) {
-	panic("Not implemented.")
+	arg0 := C.CString(symbol_name)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := (unsafe.Pointer)(symbol)
+	C.gi_typelib_symbol(s.c(), arg0, &arg1)
 }
 
 func (s *Typelib) Unref() {
