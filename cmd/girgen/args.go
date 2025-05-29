@@ -67,7 +67,7 @@ func (args *Arguments) ConvertToC() string {
 			fmt.Fprintf(&buf, "%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))\n", arg.CName(), arg.GoName(), arg.CName())
 
 		default:
-			fmt.Fprintf(&buf, "%v := (%v)(%v)", arg.CName(), arg.CType(), arg.CName())
+			fmt.Fprintf(&buf, "%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
 		}
 	}
 
