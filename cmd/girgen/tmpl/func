@@ -1,7 +1,8 @@
 {{if .Element.IsMethod}}
-	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{.Arguments}}) {
-		{{- .ConvertArguments}}
-		{{.Call "s" -}}
+	{{$args := .Arguments}}
+	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) {
+		{{$args.ConvertToC}}
+		C.{{.MethodName .Type.GetName .Element.GetName}}(s.c(), {{$args.CInput}})
 	}
 {{else}}
 	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{.Arguments}}) {
