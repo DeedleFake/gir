@@ -23,3 +23,8 @@ func (err *Error) c() *C.GError {
 func (err *Error) Error() string {
 	return C.GoString(err.c().message)
 }
+
+type Bytes struct {
+	_ structs.HostLayout
+	_ [unsafe.Sizeof(*new(C.GBytes))]byte
+}

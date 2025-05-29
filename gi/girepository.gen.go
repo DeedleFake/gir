@@ -11,6 +11,8 @@ import "C"
 import (
 	"structs"
 	"unsafe"
+
+	"deedles.dev/gir/g"
 )
 
 type AttributeIter struct {
@@ -77,7 +79,7 @@ func (s *Typelib) c() *C.GITypelib {
 	return (*C.GITypelib)(unsafe.Pointer(s))
 }
 
-func TypelibNewFromBytes(bytes any) {
+func TypelibNewFromBytes(bytes *g.Bytes) {
 	panic("Not implemented.")
 }
 
@@ -89,7 +91,7 @@ func (s *Typelib) Ref() {
 	C.gi_typelib_ref(s.c())
 }
 
-func (s *Typelib) Symbol(symbol_name any, symbol any) {
+func (s *Typelib) Symbol(symbol_name string, symbol unsafe.Pointer) {
 	panic("Not implemented.")
 }
 
