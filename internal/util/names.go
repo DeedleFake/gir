@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -28,4 +29,8 @@ func ToSnakeCase(name string) string {
 func ParseCPrefix(cprefix string) string {
 	prefix, _, _ := strings.Cut(cprefix, ",")
 	return prefix
+}
+
+func MethodName(prefix, tname, mname string) string {
+	return fmt.Sprintf("%v_%v_%v", strings.ToLower(prefix), ToSnakeCase(tname), mname)
 }
