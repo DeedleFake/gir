@@ -1,11 +1,12 @@
+{{$args := .Arguments}}
+
 {{if .Element.IsMethod}}
-	{{$args := .Arguments}}
-	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) {
-		{{$args.ConvertToC}}
-		C.{{.MethodName .Type.GetName .Element.GetName}}(s.c(), {{$args.CInput}})
+	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
+		{{/*{{$args.ConvertToC}}
+		C.{{.MethodName .Type.GetName .Element.GetName}}(s.c(), {{$args.CInput}})*/}}
 	}
 {{else}}
-	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{.Arguments}}) {
+	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
 		panic("Not implemented.")
 	}
 {{end}}

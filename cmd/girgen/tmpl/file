@@ -12,8 +12,8 @@ import "C"
 
 import()
 
-{{range (.Repo.GetInfos .Config.Namespace)}}
-	{{with toStruct .}}
+{{range $_, $info := (.Repo.GetInfos .Config.Namespace)}}
+	{{with toStruct $info}}
 		{{$.Generate "struct" . nil}}
 	{{end}}
 {{end}}

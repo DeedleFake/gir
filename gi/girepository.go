@@ -359,6 +359,10 @@ func (info *ArgInfo) GetTypeInfo() *TypeInfo {
 	return (*TypeInfo)(unsafe.Pointer(C.gi_arg_info_get_type_info(info.c())))
 }
 
+func (info *ArgInfo) IsReturnValue() bool {
+	return C.gi_arg_info_is_return_value(info.c()) != 0
+}
+
 type Direction int
 
 const (

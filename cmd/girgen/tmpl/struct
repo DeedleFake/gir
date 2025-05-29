@@ -2,8 +2,8 @@
 	type {{.Type.GetName}} struct {
 		_ structs.HostLayout
 		_ [{{.Type.GetSize}}]byte
-		{{range .Type.GetFields}}
-			// {{.GetName}}
+		{{range $_, $field := .Type.GetFields}}
+			// {{$field.GetName}}
 		{{end}}
 	}
 
@@ -11,7 +11,7 @@
 		return (*C.{{.CName}})(unsafe.Pointer(s))
 	}
 
-	{{range .Type.GetMethods}}
-		{{$.Generate "func" $.Type .}}
+	{{range $_, $method := .Type.GetMethods}}
+		{{$.Generate "func" $.Type $method}}
 	{{end}}
 {{end}}
