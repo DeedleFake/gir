@@ -76,6 +76,10 @@ func (gen Generator) Generate(name string, t, element BaseInfoer) (string, error
 	return "", tmpl.ExecuteTemplate(gen.w, name, gen)
 }
 
+func (gen Generator) Package() string {
+	return strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace)))
+}
+
 func (gen Generator) CPrefix() string {
 	return util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace))
 }

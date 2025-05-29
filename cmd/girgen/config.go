@@ -9,7 +9,6 @@ import (
 )
 
 type Config struct {
-	Package    string
 	Namespace  string
 	Version    string
 	Includes   []string
@@ -39,11 +38,6 @@ func ParseConfig(r io.Reader) (*Config, error) {
 
 func (config *Config) run(directive []string) error {
 	switch directive[0] {
-	case "package":
-		return assertArgs(directive, 1, 1, func() {
-			config.Package = directive[1]
-		})
-
 	case "namespace":
 		return assertArgs(directive, 1, 1, func() {
 			config.Namespace = directive[1]

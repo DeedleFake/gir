@@ -1,6 +1,8 @@
 package main
 
-import "deedles.dev/gir/gi"
+import (
+	"deedles.dev/gir/gi"
+)
 
 func TypeTagToGo(tag gi.TypeTag) string {
 	return [...]string{
