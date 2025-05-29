@@ -359,6 +359,18 @@ func (info *ArgInfo) GetTypeInfo() *TypeInfo {
 	return (*TypeInfo)(unsafe.Pointer(C.gi_arg_info_get_type_info(info.c())))
 }
 
+type Direction int
+
+const (
+	DirectionIn Direction = iota
+	DirectionOut
+	DirectionInout
+)
+
+func (info *ArgInfo) GetDirection() Direction {
+	return Direction(C.gi_arg_info_get_direction(info.c()))
+}
+
 type TypeInfo struct {
 	_ structs.HostLayout
 	BaseInfo

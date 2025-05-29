@@ -188,7 +188,11 @@ func (gen Generator) Call(receiver string) string {
 
 	args := make([]string, 0, callable.GetNArgs())
 	for i := range callable.GetNArgs() {
-		args = append(args, fmt.Sprintf("arg%v", i))
+		var address string
+		if callable.GetArg(i).GetDirection() != gi.DirectionIn {
+			address = "&"
+		}
+		args = append(args, fmt.Sprintf("%varg%v", address, i))
 	}
 
 	return fmt.Sprintf(
