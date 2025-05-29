@@ -162,7 +162,7 @@ func (arg *Argument) CType() string {
 	switch tag := info.GetTag(); tag {
 	case gi.TypeTagVoid:
 		if info.IsPointer() {
-			buf.WriteString("*C.void")
+			buf.WriteString("unsafe.Pointer")
 			break
 		}
 		buf.WriteString(typeTagsC[tag])
