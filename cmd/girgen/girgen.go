@@ -8,7 +8,6 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"slices"
 	"strings"
 	"text/template"
 
@@ -28,12 +27,12 @@ var (
 		"toSnakeCase": util.ToSnakeCase,
 
 		"toCallable": func(info *gi.BaseInfo) *gi.CallableInfo {
-			c, _ := gi.TypeCallableInfo.Check(info.AsGTypeInstance())
+			c, _ := gi.TypeCallableInfo.Check(info)
 			return c
 		},
 
 		"toStruct": func(info *gi.BaseInfo) *gi.StructInfo {
-			c, _ := gi.TypeStructInfo.Check(info.AsGTypeInstance())
+			c, _ := gi.TypeStructInfo.Check(info)
 			return c
 		},
 	}
@@ -78,18 +77,17 @@ func (gen Generator) Generate(name string, t, element BaseInfoer) (string, error
 }
 
 func (gen Generator) CPrefix() string {
-	prefix, _, _ := strings.Cut(gen.Repo.GetCPrefix(gen.Config.Namespace), ",")
-	return prefix
+	return util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace))
 }
 
 func (gen Generator) CName() (string, error) {
 	info := gen.Type.AsGIBaseInfo()
 
-	if info, ok := gi.TypeRegisteredTypeInfo.Check(info.AsGTypeInstance()); ok {
+	if info, ok := gi.TypeRegisteredTypeInfo.Check(info); ok {
 		return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName()), nil
 	}
 
-	if info, ok := gi.TypeCallableInfo.Check(info.AsGTypeInstance()); ok {
+	if info, ok := gi.TypeCallableInfo.Check(info); ok {
 		return fmt.Sprintf("%v_%v", strings.ToLower(gen.CPrefix()), info.GetName()), nil
 	}
 
@@ -102,14 +100,40 @@ func (gen Generator) MethodName(tname, mname string) string {
 
 func (gen Generator) Arguments() (string, error) {
 	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
-	raw := slices.Collect(callable.GetArgs())
 
-	fmt.Fprintln(os.Stderr, gen.MethodName(gen.Type.GetName(), gen.Element.GetName()))
-	for i, arg := range raw {
-		fmt.Fprintf(os.Stderr, "\t%v -> %q\n", i, arg.GetName())
+	args := make([]string, 0, callable.GetNArgs())
+	for arg := range callable.GetArgs() {
+		args = append(args, fmt.Sprintf("%v %v", arg.GetName(), gen.TypeInfoToGo(arg.GetTypeInfo())))
 	}
 
-	return "", nil
+	return strings.Join(args, ", "), nil
+}
+
+func (gen Generator) TypeInfoToGo(info *gi.TypeInfo) string {
+	var buf strings.Builder
+
+	tag := info.GetTag()
+
+	buf.WriteString(TypeTagToGo(tag))
+	switch tag {
+	case gi.TypeTagInterface:
+		i := info.GetInterface()
+		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
+			buf.WriteString(gen.RegisteredTypeToGo(i))
+		}
+	}
+
+	return buf.String()
+}
+
+func (gen Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
+	namespace := info.GetNamespace()
+	prefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(namespace))) + "."
+	if namespace == gen.Config.Namespace {
+		prefix = ""
+	}
+
+	return prefix + info.GetName()
 }
 
 func main() {

@@ -46,7 +46,7 @@ func (t Type[T]) New(props ...any) *T {
 	)))
 }
 
-func (t Type[T]) Cast(obj *TypeInstance) *T {
+func (t Type[T]) Cast(obj TypeInstancer) *T {
 	v, ok := t.Check(obj)
 	if !ok {
 		panic("type is not convertible")
@@ -54,12 +54,13 @@ func (t Type[T]) Cast(obj *TypeInstance) *T {
 	return v
 }
 
-func (t Type[T]) Check(obj *TypeInstance) (*T, bool) {
-	target := C.g_type_from_name(C.g_type_name_from_instance(obj.c()))
+func (t Type[T]) Check(obj TypeInstancer) (*T, bool) {
+	ti := obj.AsGTypeInstance()
+	target := C.g_type_from_name(C.g_type_name_from_instance(ti.c()))
 	if C.g_type_is_a(t.c(), target) == 0 && C.g_type_is_a(target, t.c()) == 0 {
 		return nil, false
 	}
-	return (*T)(unsafe.Pointer(obj)), true
+	return (*T)(unsafe.Pointer(ti)), true
 }
 
 type TypeClass struct {
@@ -75,6 +76,10 @@ func (tc *TypeClass) AsGTypeClass() *TypeClass { return tc }
 
 func (tc *TypeClass) TypeName() string {
 	return C.GoString(C.g_type_name_from_class(tc.c()))
+}
+
+type TypeInstancer interface {
+	AsGTypeInstance() *TypeInstance
 }
 
 type TypeInstance struct {

@@ -125,6 +125,10 @@ func (info *BaseInfo) IterateAttributes() iter.Seq2[string, string] {
 	}
 }
 
+func (info *BaseInfo) GetNamespace() string {
+	return C.GoString(C.gi_base_info_get_namespace(info.c()))
+}
+
 func (info *BaseInfo) Ref() {
 	C.gi_base_info_ref(unsafe.Pointer(info.c()))
 }
@@ -350,3 +354,95 @@ func (info *ArgInfo) c() *C.GIArgInfo {
 }
 
 func (info *ArgInfo) AsGIArgInfo() *ArgInfo { return info }
+
+func (info *ArgInfo) GetTypeInfo() *TypeInfo {
+	return (*TypeInfo)(unsafe.Pointer(C.gi_arg_info_get_type_info(info.c())))
+}
+
+type TypeInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [unsafe.Sizeof(*new(C.GITypeInfo)) - unsafe.Sizeof(*new(C.GIBaseInfo))]byte
+}
+
+func (info *TypeInfo) c() *C.GITypeInfo {
+	return (*C.GITypeInfo)(unsafe.Pointer(info))
+}
+
+func (info *TypeInfo) AsGITypeInfo() *TypeInfo {
+	return info
+}
+
+type TypeTag int
+
+const (
+	TypeTagVoid TypeTag = iota
+	TypeTagBoolean
+	TypeTagInt8
+	TypeTagUint8
+	TypeTagInt16
+	TypeTagUint16
+	TypeTagInt32
+	TypeTagUint32
+	TypeTagInt64
+	TypeTagUint64
+	TypeTagFloat
+	TypeTagDouble
+	TypeTagGType
+	TypeTagUTF8
+	TypeTagFilename
+	TypeTagArray
+	TypeTagInterface
+	TypeTagGList
+	TypeTagGSList
+	TypeTagGHash
+	TypeTagError
+	TypeTagUnichar
+)
+
+func (tag TypeTag) String() string {
+	return [...]string{
+		"Void",
+		"Boolean",
+		"Int8",
+		"Uint8",
+		"Int16",
+		"Uint16",
+		"Int32",
+		"Uint32",
+		"Int64",
+		"Uint64",
+		"Float",
+		"Double",
+		"GType",
+		"UTF8",
+		"Filename",
+		"Array",
+		"Interface",
+		"GList",
+		"GSList",
+		"GHash",
+		"Error",
+		"Unichar",
+	}[tag]
+}
+
+func (info *TypeInfo) GetTag() TypeTag {
+	return TypeTag(C.gi_type_info_get_tag(info.c()))
+}
+
+func (info *TypeInfo) GetStorageType() TypeTag {
+	return TypeTag(C.gi_type_info_get_storage_type(info.c()))
+}
+
+func (info *TypeInfo) GetParamType(n uint) *TypeInfo {
+	return (*TypeInfo)(unsafe.Pointer(C.gi_type_info_get_param_type(info.c(), C.uint(n))))
+}
+
+func (info *TypeInfo) GetInterface() *BaseInfo {
+	return (*BaseInfo)(unsafe.Pointer(C.gi_type_info_get_interface(info.c())))
+}
+
+func (info *TypeInfo) IsPointer() bool {
+	return C.gi_type_info_is_pointer(info.c()) != 0
+}
