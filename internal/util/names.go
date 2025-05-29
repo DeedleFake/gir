@@ -24,3 +24,8 @@ func ToSnakeCase(name string) string {
 	}
 	return buf.String()
 }
+
+func ParseCPrefix(cprefix string) string {
+	prefix, _, _ := strings.Cut(cprefix, ",")
+	return prefix
+}
