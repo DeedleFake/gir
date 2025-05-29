@@ -388,14 +388,14 @@ const (
 	TypeTagUint64
 	TypeTagFloat
 	TypeTagDouble
-	TypeTagGType
-	TypeTagUTF8
+	TypeTagGtype
+	TypeTagUtf
 	TypeTagFilename
 	TypeTagArray
 	TypeTagInterface
-	TypeTagGList
-	TypeTagGSList
-	TypeTagGHash
+	TypeTagGlist
+	TypeTagGslist
+	TypeTagGhash
 	TypeTagError
 	TypeTagUnichar
 )
@@ -404,24 +404,24 @@ func (tag TypeTag) String() string {
 	return [...]string{
 		"Void",
 		"Boolean",
-		"Int8",
-		"Uint8",
-		"Int16",
-		"Uint16",
-		"Int32",
-		"Uint32",
-		"Int64",
-		"Uint64",
+		"Int",
+		"Uint",
+		"Int",
+		"Uint",
+		"Int",
+		"Uint",
+		"Int",
+		"Uint",
 		"Float",
 		"Double",
-		"GType",
-		"UTF8",
+		"Gtype",
+		"Utf",
 		"Filename",
 		"Array",
 		"Interface",
-		"GList",
-		"GSList",
-		"GHash",
+		"Glist",
+		"Gslist",
+		"Ghash",
 		"Error",
 		"Unichar",
 	}[tag]

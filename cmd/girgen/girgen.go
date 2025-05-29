@@ -121,14 +121,17 @@ func (gen Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 	var buf strings.Builder
 
 	tag := info.GetTag()
-
-	buf.WriteString(TypeTagToGo(tag))
 	switch tag {
 	case gi.TypeTagInterface:
+		if info.IsPointer() {
+			buf.WriteByte('*')
+		}
 		i := info.GetInterface()
 		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
 			buf.WriteString(gen.RegisteredTypeToGo(i))
 		}
+	default:
+		buf.WriteString(TypeTagToGo(tag))
 	}
 
 	return buf.String()
