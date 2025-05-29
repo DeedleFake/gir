@@ -58,3 +58,9 @@ func JoinPairs[T1, T2 any](seq iter.Seq2[T1, T2], psep, sep string) string {
 		}
 	}), sep)
 }
+
+func Not[T any](f func(T) bool) func(T) bool {
+	return func(v T) bool {
+		return !f(v)
+	}
+}
