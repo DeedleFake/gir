@@ -75,12 +75,12 @@ func (r *Repository) GetInfo(namespace string, index uint) *BaseInfo {
 	return (*BaseInfo)(unsafe.Pointer(C.gi_repository_get_info(r.c(), cnamespace, C.uint(index))))
 }
 
-func (r *Repository) GetInfos(namespace string) iter.Seq[*BaseInfo] {
-	return func(yield func(*BaseInfo) bool) {
+func (r *Repository) GetInfos(namespace string) iter.Seq2[uint, *BaseInfo] {
+	return func(yield func(uint, *BaseInfo) bool) {
 		n := r.GetNInfos(namespace)
 		for i := range n {
 			info := r.GetInfo(namespace, i)
-			if !yield(info) {
+			if !yield(i, info) {
 				return
 			}
 		}
@@ -167,11 +167,11 @@ func (info *CallableInfo) GetArg(index uint) *ArgInfo {
 	return (*ArgInfo)(unsafe.Pointer(C.gi_callable_info_get_arg(info.c(), C.uint(index))))
 }
 
-func (info *CallableInfo) GetArgs() iter.Seq[*ArgInfo] {
-	return func(yield func(*ArgInfo) bool) {
+func (info *CallableInfo) GetArgs() iter.Seq2[uint, *ArgInfo] {
+	return func(yield func(uint, *ArgInfo) bool) {
 		n := info.GetNArgs()
 		for i := range n {
-			if !yield(info.GetArg(i)) {
+			if !yield(i, info.GetArg(i)) {
 				return
 			}
 		}
@@ -262,11 +262,11 @@ func (info *ObjectInfo) GetMethod(index uint) *FunctionInfo {
 	return (*FunctionInfo)(unsafe.Pointer(C.gi_object_info_get_method(info.c(), C.uint(index))))
 }
 
-func (info *ObjectInfo) GetMethods() iter.Seq[*FunctionInfo] {
-	return func(yield func(*FunctionInfo) bool) {
+func (info *ObjectInfo) GetMethods() iter.Seq2[uint, *FunctionInfo] {
+	return func(yield func(uint, *FunctionInfo) bool) {
 		n := info.GetNMethods()
 		for i := range n {
-			if !yield(info.GetMethod(i)) {
+			if !yield(i, info.GetMethod(i)) {
 				return
 			}
 		}
@@ -295,11 +295,11 @@ func (info *StructInfo) GetMethod(index uint) *FunctionInfo {
 	return (*FunctionInfo)(unsafe.Pointer(C.gi_struct_info_get_method(info.c(), C.uint(index))))
 }
 
-func (info *StructInfo) GetMethods() iter.Seq[*FunctionInfo] {
-	return func(yield func(*FunctionInfo) bool) {
+func (info *StructInfo) GetMethods() iter.Seq2[uint, *FunctionInfo] {
+	return func(yield func(uint, *FunctionInfo) bool) {
 		n := info.GetNMethods()
 		for i := range n {
-			if !yield(info.GetMethod(i)) {
+			if !yield(i, info.GetMethod(i)) {
 				return
 			}
 		}
@@ -314,11 +314,11 @@ func (info *StructInfo) GetField(index uint) *FieldInfo {
 	return (*FieldInfo)(unsafe.Pointer(C.gi_struct_info_get_field(info.c(), C.uint(index))))
 }
 
-func (info *StructInfo) GetFields() iter.Seq[*FieldInfo] {
-	return func(yield func(*FieldInfo) bool) {
+func (info *StructInfo) GetFields() iter.Seq2[uint, *FieldInfo] {
+	return func(yield func(uint, *FieldInfo) bool) {
 		n := info.GetNFields()
 		for i := range n {
-			if !yield(info.GetField(i)) {
+			if !yield(i, info.GetField(i)) {
 				return
 			}
 		}

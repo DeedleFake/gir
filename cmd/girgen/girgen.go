@@ -13,7 +13,6 @@ import (
 
 	"deedles.dev/gir/gi"
 	"deedles.dev/gir/internal/util"
-	"deedles.dev/xiter"
 	"golang.org/x/tools/imports"
 )
 
@@ -111,7 +110,7 @@ func (gen Generator) Arguments() string {
 	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
 
 	args := make([]string, 0, callable.GetNArgs())
-	for arg := range callable.GetArgs() {
+	for _, arg := range callable.GetArgs() {
 		args = append(args, fmt.Sprintf("%v %v", arg.GetName(), gen.TypeInfoToGo(arg.GetTypeInfo())))
 	}
 
@@ -170,7 +169,7 @@ func (gen Generator) ConvertArguments() string {
 	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
 
 	var buf strings.Builder
-	for i, arg := range xiter.Enumerate(callable.GetArgs()) {
+	for i, arg := range callable.GetArgs() {
 		ti := arg.GetTypeInfo()
 		switch tag := ti.GetTag(); tag {
 		case gi.TypeTagUtf, gi.TypeTagFilename:
