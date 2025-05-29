@@ -81,7 +81,7 @@ func (gen Generator) Generate(name string, t, element BaseInfoer) (string, error
 }
 
 func (gen Generator) Package() string {
-	return strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace)))
+	return strings.ToLower(gen.CPrefix())
 }
 
 func (gen Generator) CPrefix() string {
@@ -138,13 +138,13 @@ func (gen Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 }
 
 func (gen Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
-	namespace := info.GetNamespace()
-	prefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(namespace))) + "."
-	if namespace == gen.Config.Namespace {
-		prefix = ""
+	localPrefix := strings.ToLower(gen.CPrefix()) + "."
+	typePrefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(info.GetNamespace()))) + "."
+	if localPrefix == typePrefix {
+		typePrefix = ""
 	}
 
-	return prefix + info.GetName()
+	return typePrefix + info.GetName()
 }
 
 func main() {
