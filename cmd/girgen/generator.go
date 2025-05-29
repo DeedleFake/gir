@@ -72,23 +72,3 @@ func (gen *Generator) Arguments() *Arguments {
 	args.Load()
 	return &args
 }
-
-func (gen *Generator) Call(receiver string) string {
-	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
-
-	args := make([]string, 0, callable.GetNArgs())
-	for i := range callable.GetNArgs() {
-		var address string
-		if callable.GetArg(i).GetDirection() != gi.DirectionIn {
-			address = "&"
-		}
-		args = append(args, fmt.Sprintf("%varg%v", address, i))
-	}
-
-	return fmt.Sprintf(
-		"C.%v(%v.c(), %v)",
-		gen.MethodName(gen.Type.GetName(), gen.Element.GetName()),
-		receiver,
-		strings.Join(args, ", "),
-	)
-}

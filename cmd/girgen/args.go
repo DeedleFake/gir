@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"iter"
+	"runtime"
 	"slices"
 	"strings"
 
@@ -26,6 +27,8 @@ func (args *Arguments) Load() {
 			Index:     i,
 			Info:      info,
 		}
+		runtime.AddCleanup(&arg, (*gi.BaseInfo).Unref, info.AsGIBaseInfo())
+
 		args.Args = append(args.Args, &arg)
 		remove = append(remove, arg.SubArgs()...)
 	}
@@ -45,7 +48,7 @@ func (args *Arguments) GoOutput() string {
 }
 
 func (args *Arguments) CInput() string {
-	return util.JoinSeq(xiter.Flatten(argsCNames(args.cInput())), ", ")
+	return util.JoinSeq(argsCInput(args.cInput()), ", ")
 }
 
 func (args *Arguments) ConvertToC() string {
@@ -121,8 +124,12 @@ func (arg *Argument) GoType() string {
 	return buf.String()
 }
 
-func (arg *Argument) CNames() []string {
-	return []string{fmt.Sprintf("arg%v", arg.Index)}
+func (arg *Argument) CInput() string {
+	var address string
+	if arg.Info.GetDirection() != gi.DirectionIn {
+		address = "&"
+	}
+	return fmt.Sprintf("%varg%v", address, arg.Index)
 }
 
 func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
@@ -165,10 +172,10 @@ func argsGoNameType(seq iter.Seq[*Argument]) iter.Seq2[string, string] {
 	}
 }
 
-func argsCNames(seq iter.Seq[*Argument]) iter.Seq[iter.Seq[string]] {
-	return func(yield func(iter.Seq[string]) bool) {
+func argsCInput(seq iter.Seq[*Argument]) iter.Seq[string] {
+	return func(yield func(string) bool) {
 		for arg := range seq {
-			if !yield(slices.Values(arg.CNames())) {
+			if !yield(arg.CInput()) {
 				return
 			}
 		}
