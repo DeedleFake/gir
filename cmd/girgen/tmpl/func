@@ -1,10 +1,7 @@
 {{if .Element.IsMethod}}
 	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{.Arguments}}) {
-		{{- if .Element.GetNArgs}}
-			panic("Not implemented.")
-		{{else}}
-			C.{{.MethodName .Type.GetName .Element.GetName}}(s.c())
-		{{end -}}
+		{{- .ConvertArguments}}
+		{{.Call "s" -}}
 	}
 {{else}}
 	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{.Arguments}}) {

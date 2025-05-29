@@ -13,6 +13,7 @@ import (
 
 	"deedles.dev/gir/gi"
 	"deedles.dev/gir/internal/util"
+	"deedles.dev/xiter"
 	"golang.org/x/tools/imports"
 )
 
@@ -103,10 +104,10 @@ func (gen Generator) CName() (string, error) {
 }
 
 func (gen Generator) MethodName(tname, mname string) string {
-	return fmt.Sprintf("%v_%v_%v", strings.ToLower(gen.CPrefix()), util.ToSnakeCase(tname), mname)
+	return util.MethodName(gen.CPrefix(), tname, mname)
 }
 
-func (gen Generator) Arguments() (string, error) {
+func (gen Generator) Arguments() string {
 	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
 
 	args := make([]string, 0, callable.GetNArgs())
@@ -114,14 +115,12 @@ func (gen Generator) Arguments() (string, error) {
 		args = append(args, fmt.Sprintf("%v %v", arg.GetName(), gen.TypeInfoToGo(arg.GetTypeInfo())))
 	}
 
-	return strings.Join(args, ", "), nil
+	return strings.Join(args, ", ")
 }
 
 func (gen Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 	var buf strings.Builder
-
-	tag := info.GetTag()
-	switch tag {
+	switch tag := info.GetTag(); tag {
 	case gi.TypeTagInterface:
 		if info.IsPointer() {
 			buf.WriteByte('*')
@@ -145,6 +144,59 @@ func (gen Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
 	}
 
 	return typePrefix + info.GetName()
+}
+
+func (gen Generator) TypeInfoToC(info *gi.TypeInfo) string {
+	var buf strings.Builder
+	switch tag := info.GetTag(); tag {
+	case gi.TypeTagInterface:
+		if info.IsPointer() {
+			buf.WriteByte('*')
+		}
+		i := info.GetInterface()
+		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
+			buf.WriteString("C.")
+			buf.WriteString(i.GetTypeName())
+		}
+
+	default:
+		buf.WriteString(TypeTagToC(tag))
+	}
+
+	return buf.String()
+}
+
+func (gen Generator) ConvertArguments() string {
+	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
+
+	var buf strings.Builder
+	for i, arg := range xiter.Enumerate(callable.GetArgs()) {
+		ti := arg.GetTypeInfo()
+		switch tag := ti.GetTag(); tag {
+		case gi.TypeTagUtf, gi.TypeTagFilename:
+			fmt.Fprintf(&buf, "arg%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(arg%v))\n", i, arg.GetName(), i)
+		default:
+			fmt.Fprintf(&buf, "arg%v := (%v)(%v)", i, gen.TypeInfoToC(ti), arg.GetName())
+		}
+	}
+
+	return buf.String()
+}
+
+func (gen Generator) Call(receiver string) string {
+	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
+
+	args := make([]string, 0, callable.GetNArgs())
+	for i := range callable.GetNArgs() {
+		args = append(args, fmt.Sprintf("arg%v", i))
+	}
+
+	return fmt.Sprintf(
+		"C.%v(%v.c(), %v)",
+		gen.MethodName(gen.Type.GetName(), gen.Element.GetName()),
+		receiver,
+		strings.Join(args, ", "),
+	)
 }
 
 func main() {
