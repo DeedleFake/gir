@@ -45,11 +45,24 @@ func (args *Arguments) GoOutput() string {
 }
 
 func (args *Arguments) CInput() string {
-	panic("Not impelemented.")
+	return util.JoinSeq(xiter.Flatten(argsCNames(args.cInput())), ", ")
 }
 
 func (args *Arguments) ConvertToC() string {
-	panic("Not impelemented.")
+	callable := args.Callable()
+
+	var buf strings.Builder
+	for i, arg := range callable.GetArgs() {
+		ti := arg.GetTypeInfo()
+		switch tag := ti.GetTag(); tag {
+		case gi.TypeTagUtf, gi.TypeTagFilename:
+			fmt.Fprintf(&buf, "arg%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(arg%v))\n", i, arg.GetName(), i)
+		default:
+			fmt.Fprintf(&buf, "arg%v := (%v)(%v)", i, args.TypeInfoToC(ti), arg.GetName())
+		}
+	}
+
+	return buf.String()
 }
 
 func (args *Arguments) goInput() iter.Seq[*Argument] {
@@ -58,6 +71,10 @@ func (args *Arguments) goInput() iter.Seq[*Argument] {
 
 func (args *Arguments) goOutput() iter.Seq[*Argument] {
 	return xiter.Filter(slices.Values(args.Args), util.Not((*Argument).IsInput))
+}
+
+func (args *Arguments) cInput() iter.Seq[*Argument] {
+	return xiter.Filter(slices.Values(args.Args), (*Argument).IsCInput)
 }
 
 type Argument struct {
@@ -70,6 +87,14 @@ type Argument struct {
 func (arg *Argument) SubArgs() []int {
 	// TODO
 	return nil
+}
+
+func (arg *Argument) IsInput() bool {
+	return !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
+}
+
+func (arg *Argument) IsCInput() bool {
+	return !arg.Info.IsReturnValue()
 }
 
 func (arg *Argument) GoName() string {
@@ -96,8 +121,8 @@ func (arg *Argument) GoType() string {
 	return buf.String()
 }
 
-func (arg *Argument) IsInput() bool {
-	return !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
+func (arg *Argument) CNames() []string {
+	return []string{fmt.Sprintf("arg%v", arg.Index)}
 }
 
 func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
@@ -130,27 +155,20 @@ func (gen *Generator) TypeInfoToC(info *gi.TypeInfo) string {
 	return buf.String()
 }
 
-func (gen *Generator) ConvertArguments() string {
-	callable := gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
-
-	var buf strings.Builder
-	for i, arg := range callable.GetArgs() {
-		ti := arg.GetTypeInfo()
-		switch tag := ti.GetTag(); tag {
-		case gi.TypeTagUtf, gi.TypeTagFilename:
-			fmt.Fprintf(&buf, "arg%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(arg%v))\n", i, arg.GetName(), i)
-		default:
-			fmt.Fprintf(&buf, "arg%v := (%v)(%v)", i, gen.TypeInfoToC(ti), arg.GetName())
-		}
-	}
-
-	return buf.String()
-}
-
 func argsGoNameType(seq iter.Seq[*Argument]) iter.Seq2[string, string] {
 	return func(yield func(string, string) bool) {
 		for arg := range seq {
 			if !yield(arg.GoName(), arg.GoType()) {
+				return
+			}
+		}
+	}
+}
+
+func argsCNames(seq iter.Seq[*Argument]) iter.Seq[iter.Seq[string]] {
+	return func(yield func(iter.Seq[string]) bool) {
+		for arg := range seq {
+			if !yield(slices.Values(arg.CNames())) {
 				return
 			}
 		}

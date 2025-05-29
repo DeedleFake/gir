@@ -2,8 +2,9 @@
 
 {{if .Element.IsMethod}}
 	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
-		{{/*{{$args.ConvertToC}}
-		C.{{.MethodName .Type.GetName .Element.GetName}}(s.c(), {{$args.CInput}})*/}}
+		{{$args.ConvertToC}}
+		C.{{.MethodName .Type.GetName .Element.GetName}}(s.c(), {{$args.CInput}})
+		{{if $args.GoOutput}}panic("Not implemented."){{end}}
 	}
 {{else}}
 	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
