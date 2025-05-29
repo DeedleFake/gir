@@ -29,15 +29,6 @@ func (s *AttributeIter) c() *C.GIAttributeIter {
 	return (*C.GIAttributeIter)(unsafe.Pointer(s))
 }
 
-type BaseInfoClass struct {
-	_ structs.HostLayout
-	_ [0]byte
-}
-
-func (s *BaseInfoClass) c() *C.GIBaseInfoClass {
-	return (*C.GIBaseInfoClass)(unsafe.Pointer(s))
-}
-
 type BaseInfoStack struct {
 	_ structs.HostLayout
 	_ [96]byte
@@ -56,18 +47,6 @@ type BaseInfoStack struct {
 
 func (s *BaseInfoStack) c() *C.GIBaseInfoStack {
 	return (*C.GIBaseInfoStack)(unsafe.Pointer(s))
-}
-
-type RepositoryClass struct {
-	_ structs.HostLayout
-	_ [136]byte
-
-	// parent_class
-
-}
-
-func (s *RepositoryClass) c() *C.GIRepositoryClass {
-	return (*C.GIRepositoryClass)(unsafe.Pointer(s))
 }
 
 type Typelib struct {

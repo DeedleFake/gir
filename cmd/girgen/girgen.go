@@ -26,6 +26,10 @@ var (
 		"toCamelCase": util.ToCamelCase,
 		"toSnakeCase": util.ToSnakeCase,
 
+		"isClass": func(name string) bool {
+			return strings.HasSuffix(name, "Class")
+		},
+
 		"toCallable": func(info *gi.BaseInfo) *gi.CallableInfo {
 			c, _ := gi.TypeCallableInfo.Check(info)
 			return c

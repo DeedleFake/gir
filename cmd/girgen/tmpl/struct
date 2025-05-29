@@ -1,4 +1,4 @@
-{{if not .Type.IsForeign}}
+{{if and (not .Type.IsForeign) (not (isClass .Type.GetName))}}
 	type {{.Type.GetName}} struct {
 		_ structs.HostLayout
 		_ [{{.Type.GetSize}}]byte
