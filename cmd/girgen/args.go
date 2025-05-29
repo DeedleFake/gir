@@ -20,7 +20,7 @@ type Arguments struct {
 func (args *Arguments) Load() {
 	callable := args.Callable()
 
-	var remove []int
+	var hide []int
 	for i, info := range callable.GetArgs() {
 		arg := Argument{
 			Generator: args.Generator,
@@ -30,38 +30,44 @@ func (args *Arguments) Load() {
 		runtime.AddCleanup(&arg, (*gi.BaseInfo).Unref, info.AsGIBaseInfo())
 
 		args.Args = append(args.Args, &arg)
-		remove = append(remove, arg.SubArgs()...)
+		hide = append(hide, arg.Obscured()...)
 	}
 
-	slices.Sort(remove)
-	for _, i := range slices.Backward(remove) {
-		args.Args = slices.Delete(args.Args, i, i)
+	for _, i := range hide {
+		args.Args[i].Hidden = true
 	}
 }
 
 func (args *Arguments) GoInput() string {
-	return util.JoinPairs(argsGoNameType(args.goInput()), " ", ", ")
+	return util.JoinSeq(argsGoInput(args.goInput()), ", ")
 }
 
 func (args *Arguments) GoOutput() string {
-	return util.JoinPairs(argsGoNameType(args.goOutput()), " ", ", ")
+	return util.JoinSeq(argsGoInput(args.goOutput()), ", ")
 }
 
 func (args *Arguments) CInput() string {
 	return util.JoinSeq(argsCInput(args.cInput()), ", ")
 }
 
-func (args *Arguments) ConvertToC() string {
-	callable := args.Callable()
+func (args *Arguments) COutput() string {
+	arg := args.cOutput()
+	if arg == nil {
+		return ""
+	}
+	return arg.CName()
+}
 
+func (args *Arguments) ConvertToC() string {
 	var buf strings.Builder
-	for i, arg := range callable.GetArgs() {
-		ti := arg.GetTypeInfo()
+	for arg := range args.cInput() {
+		ti := arg.Info.GetTypeInfo()
 		switch tag := ti.GetTag(); tag {
-		case gi.TypeTagUtf, gi.TypeTagFilename:
-			fmt.Fprintf(&buf, "arg%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(arg%v))\n", i, arg.GetName(), i)
+		case gi.TypeTagUtf:
+			fmt.Fprintf(&buf, "%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))\n", arg.CName(), arg.GoName(), arg.CName())
+
 		default:
-			fmt.Fprintf(&buf, "arg%v := (%v)(%v)", i, args.TypeInfoToC(ti), arg.GetName())
+			fmt.Fprintf(&buf, "%v := (%v)(%v)", arg.CName(), arg.CType(), arg.CName())
 		}
 	}
 
@@ -80,14 +86,23 @@ func (args *Arguments) cInput() iter.Seq[*Argument] {
 	return xiter.Filter(slices.Values(args.Args), (*Argument).IsCInput)
 }
 
+func (args *Arguments) cOutput() *Argument {
+	f := slices.Collect(xiter.Filter(slices.Values(args.Args), func(arg *Argument) bool { return arg.Info.IsReturnValue() }))
+	if len(f) == 0 {
+		return nil
+	}
+	return f[0]
+}
+
 type Argument struct {
 	*Generator
 
-	Index uint
-	Info  *gi.ArgInfo
+	Index  uint
+	Info   *gi.ArgInfo
+	Hidden bool
 }
 
-func (arg *Argument) SubArgs() []int {
+func (arg *Argument) Obscured() []int {
 	// TODO
 	return nil
 }
@@ -100,6 +115,10 @@ func (arg *Argument) IsCInput() bool {
 	return !arg.Info.IsReturnValue()
 }
 
+func (arg *Argument) GoInput() string {
+	return fmt.Sprintf("%v %v", arg.GoName(), arg.GoType())
+}
+
 func (arg *Argument) GoName() string {
 	return arg.Info.GetName()
 }
@@ -109,6 +128,9 @@ func (arg *Argument) GoType() string {
 
 	var buf strings.Builder
 	switch tag := info.GetTag(); tag {
+	case gi.TypeTagVoid:
+		return "unsafe.Pointer"
+
 	case gi.TypeTagInterface:
 		if info.IsPointer() {
 			buf.WriteByte('*')
@@ -117,8 +139,9 @@ func (arg *Argument) GoType() string {
 		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
 			buf.WriteString(arg.RegisteredTypeToGo(i))
 		}
+
 	default:
-		buf.WriteString(TypeTagToGo(tag))
+		buf.WriteString(typeTagsGo[tag])
 	}
 
 	return buf.String()
@@ -129,7 +152,40 @@ func (arg *Argument) CInput() string {
 	if arg.Info.GetDirection() != gi.DirectionIn {
 		address = "&"
 	}
-	return fmt.Sprintf("%varg%v", address, arg.Index)
+	return fmt.Sprintf("%v%v", address, arg.CName())
+}
+
+func (arg *Argument) CType() string {
+	info := arg.Info.GetTypeInfo()
+
+	var buf strings.Builder
+	switch tag := info.GetTag(); tag {
+	case gi.TypeTagVoid:
+		if info.IsPointer() {
+			buf.WriteString("*C.void")
+			break
+		}
+		buf.WriteString(typeTagsC[tag])
+
+	case gi.TypeTagInterface:
+		if info.IsPointer() {
+			buf.WriteByte('*')
+		}
+		i := info.GetInterface()
+		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
+			buf.WriteString("C.")
+			buf.WriteString(i.GetTypeName())
+		}
+
+	default:
+		buf.WriteString(typeTagsC[tag])
+	}
+
+	return buf.String()
+}
+
+func (arg *Argument) CName() string {
+	return fmt.Sprintf("arg%v", arg.Index)
 }
 
 func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
@@ -142,42 +198,10 @@ func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
 	return typePrefix + info.GetName()
 }
 
-func (gen *Generator) TypeInfoToC(info *gi.TypeInfo) string {
-	var buf strings.Builder
-	switch tag := info.GetTag(); tag {
-	case gi.TypeTagInterface:
-		if info.IsPointer() {
-			buf.WriteByte('*')
-		}
-		i := info.GetInterface()
-		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
-			buf.WriteString("C.")
-			buf.WriteString(i.GetTypeName())
-		}
-
-	default:
-		buf.WriteString(TypeTagToC(tag))
-	}
-
-	return buf.String()
-}
-
-func argsGoNameType(seq iter.Seq[*Argument]) iter.Seq2[string, string] {
-	return func(yield func(string, string) bool) {
-		for arg := range seq {
-			if !yield(arg.GoName(), arg.GoType()) {
-				return
-			}
-		}
-	}
+func argsGoInput(seq iter.Seq[*Argument]) iter.Seq[string] {
+	return xiter.Map(seq, (*Argument).GoInput)
 }
 
 func argsCInput(seq iter.Seq[*Argument]) iter.Seq[string] {
-	return func(yield func(string) bool) {
-		for arg := range seq {
-			if !yield(arg.CInput()) {
-				return
-			}
-		}
-	}
+	return xiter.Map(seq, (*Argument).CInput)
 }
