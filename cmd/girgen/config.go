@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 
 	"deedles.dev/gir/internal/util"
@@ -13,10 +14,11 @@ type Config struct {
 	Version    string
 	Includes   []string
 	PkgConfigs []string
+	Skip       util.Set[string]
 }
 
 func ParseConfig(r io.Reader) (*Config, error) {
-	var config Config
+	config := Config{Skip: make(util.Set[string])}
 	for line, err := range util.Lines(r) {
 		if err != nil {
 			return nil, err
@@ -56,6 +58,11 @@ func (config *Config) run(directive []string) error {
 	case "pkg-config":
 		return assertArgs(directive, 1, -1, func() {
 			config.PkgConfigs = append(config.PkgConfigs, directive[1:]...)
+		})
+
+	case "skip":
+		return assertArgs(directive, 1, -1, func() {
+			config.Skip.AddAll(slices.Values(directive[1:]))
 		})
 
 	default:

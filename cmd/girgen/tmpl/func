@@ -1,17 +1,19 @@
-{{$args := .Arguments}}
+{{if .MethodName .Element.GetName | .Config.Skip.Contains | not}}
+	{{$args := .Arguments}}
 
-{{if .Element.IsMethod}}
-	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
-		{{- $args.ConvertToC -}};
-		{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}(s.c(), {{$args.CInput}});
-		{{- $args.ConvertToGo -}};
-		return
-	}
-{{else}}
-	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
-		{{- $args.ConvertToC -}};
-		{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}({{$args.CInput}});
-		{{- $args.ConvertToGo -}};
-		return
-	}
+	{{if .Element.IsMethod}}
+		func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
+			{{- $args.ConvertToC -}};
+			{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}(s.c(), {{$args.CInput}});
+			{{- $args.ConvertToGo -}};
+			return
+		}
+	{{else}}
+		func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
+			{{- $args.ConvertToC -}};
+			{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}({{$args.CInput}});
+			{{- $args.ConvertToGo -}};
+			return
+		}
+	{{end}}
 {{end}}
