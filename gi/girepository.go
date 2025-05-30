@@ -16,8 +16,6 @@ import (
 	"deedles.dev/gir/g"
 )
 
-var TypeRepository = g.ToType[Repository](uint64(C.gi_repository_get_type()))
-
 func RepositoryNew() *Repository {
 	return (*Repository)(unsafe.Pointer(C.gi_repository_new()))
 }
@@ -83,8 +81,6 @@ func (r *Repository) GetCPrefix(namespace string) string {
 	return C.GoString(C.gi_repository_get_c_prefix(r.c(), cnamespace))
 }
 
-var TypeBaseInfo = g.ToType[BaseInfo](uint64(C.gi_base_info_get_type()))
-
 func (info *BaseInfo) GetName() string {
 	return C.GoString(C.gi_base_info_get_name(info.c()))
 }
@@ -113,8 +109,6 @@ func (info *BaseInfo) Ref() {
 func (info *BaseInfo) Unref() {
 	C.gi_base_info_unref(unsafe.Pointer(info.c()))
 }
-
-var TypeCallableInfo = g.ToType[CallableInfo](uint64(C.gi_callable_info_get_type()))
 
 func (info *CallableInfo) IsMethod() bool {
 	return C.gi_callable_info_is_method(info.c()) != 0
@@ -151,8 +145,6 @@ func (info *CallableInfo) CanThrowGerror() bool {
 	return C.gi_callable_info_can_throw_gerror(info.c()) != 0
 }
 
-var TypeFunctionInfo = g.ToType[FunctionInfo](uint64(C.gi_function_info_get_type()))
-
 type FunctionInfoFlags int
 
 const (
@@ -169,10 +161,6 @@ func (info *FunctionInfo) GetFlags() FunctionInfoFlags {
 	return FunctionInfoFlags(C.gi_function_info_get_flags(info.c()))
 }
 
-var TypeConstantInfo = g.ToType[ConstantInfo](uint64(C.gi_constant_info_get_type()))
-
-var TypeRegisteredTypeInfo = g.ToType[RegisteredTypeInfo](uint64(C.gi_registered_type_info_get_type()))
-
 func (info *RegisteredTypeInfo) GetTypeName() string {
 	return C.GoString(C.gi_registered_type_info_get_type_name(info.c()))
 }
@@ -184,8 +172,6 @@ func (info *RegisteredTypeInfo) GetGType() g.Type[g.TypeInstance] {
 func (info *RegisteredTypeInfo) GetTypeInitFunctionName() string {
 	return C.GoString(C.gi_registered_type_info_get_type_init_function_name(info.c()))
 }
-
-var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
 func (info *ObjectInfo) GetNMethods() uint {
 	return uint(C.gi_object_info_get_n_methods(info.c()))
@@ -209,8 +195,6 @@ func (info *ObjectInfo) GetMethods() iter.Seq2[uint, *FunctionInfo] {
 func (info *ObjectInfo) GetParent() *ObjectInfo {
 	return (*ObjectInfo)(unsafe.Pointer(C.gi_object_info_get_parent(info.c())))
 }
-
-var TypeStructInfo = g.ToType[StructInfo](uint64(C.gi_struct_info_get_type()))
 
 func (info *StructInfo) GetNMethods() uint {
 	return uint(C.gi_struct_info_get_n_methods(info.c()))
@@ -257,8 +241,6 @@ func (info *StructInfo) GetSize() uint64 {
 func (info *StructInfo) IsForeign() bool {
 	return C.gi_struct_info_is_foreign(info.c()) != 0
 }
-
-var TypeArgInfo = g.ToType[ArgInfo](uint64(C.gi_arg_info_get_type()))
 
 func (info *ArgInfo) GetTypeInfo() *TypeInfo {
 	return (*TypeInfo)(unsafe.Pointer(C.gi_arg_info_get_type_info(info.c())))
