@@ -166,3 +166,5 @@ func (obj *Object) Unref() {
 }
 
 type ParamFlags int64
+
+type SignalFlags int64
