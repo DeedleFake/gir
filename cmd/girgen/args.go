@@ -272,7 +272,7 @@ func (arg *Argument) ConvertToC() string {
 		return fmt.Sprintf("%v := C.CString(%v)%v", arg.CName(), arg.GoName(), free)
 
 	case gi.TypeTagInterface:
-		return fmt.Sprintf("%v = (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())
+		return fmt.Sprintf("%v := (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())
 
 	default:
 		return fmt.Sprintf("%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
