@@ -1,3 +1,5 @@
+var Type{{.Type.GetName}} = {{with $.PackageFor "GLib"}}{{.}}.{{end}}ToType[{{.Type.GetName}}](C.{{$.MethodName .Type.GetName "get_type"}}())
+
 type {{.Type.GetName}} struct {
 	_ structs.HostLayout
 	{{with parent .Type}}{{with $.PackageFor .GetNamespace}}{{.}}.{{end}}{{.GetName}}{{end}}

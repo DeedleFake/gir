@@ -50,6 +50,11 @@ var (
 			c, _ := gi.TypeObjectInfo.Check(info)
 			return c
 		},
+
+		"toConstant": func(info *gi.BaseInfo) *gi.ConstantInfo {
+			c, _ := gi.TypeConstantInfo.Check(info)
+			return c
+		},
 	}
 )
 

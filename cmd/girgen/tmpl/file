@@ -20,4 +20,8 @@ import()
 	{{with toObject $info}}
 		{{$.Generate "object" . nil}}
 	{{end}}
+
+	{{with toConstant $info}}
+		{{$.Generate "constant" . nil}}
+	{{end}}
 {{end}}
