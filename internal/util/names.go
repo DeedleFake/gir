@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"go/token"
 	"strings"
 	"unicode"
 )
@@ -33,4 +34,11 @@ func ParseCPrefix(cprefix string) string {
 
 func MethodName(prefix, tname, mname string) string {
 	return fmt.Sprintf("%v_%v_%v", strings.ToLower(prefix), ToSnakeCase(tname), mname)
+}
+
+func AvoidKeywords(name string) string {
+	if token.IsKeyword(name) {
+		return "_" + name
+	}
+	return name
 }
