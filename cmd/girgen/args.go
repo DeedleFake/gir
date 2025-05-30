@@ -75,11 +75,18 @@ func (args *Arguments) goOutput() iter.Seq[*Argument] {
 	if r := args.cOutput(); r != nil {
 		output = xiter.Concat(output, xiter.Of(r))
 	}
+	if err := args.err(); err != nil {
+		output = xiter.Concat(output, xiter.Of(err))
+	}
 	return output
 }
 
 func (args *Arguments) cInput() iter.Seq[*Argument] {
-	return xiter.Filter(slices.Values(args.Args), (*Argument).IsCInput)
+	input := xiter.Filter(slices.Values(args.Args), (*Argument).IsCInput)
+	if err := args.err(); err != nil {
+		input = xiter.Concat(input, xiter.Of(err))
+	}
+	return input
 }
 
 func (args *Arguments) cOutput() *Argument {
@@ -91,6 +98,14 @@ func (args *Arguments) cOutput() *Argument {
 	return &Argument{Generator: args.Generator, Return: r}
 }
 
+func (args *Arguments) err() *Argument {
+	r := args.Callable().CanThrowGerror()
+	if !r {
+		return nil
+	}
+	return &Argument{Generator: args.Generator, Error: true}
+}
+
 type Argument struct {
 	*Generator
 
@@ -98,6 +113,7 @@ type Argument struct {
 	Info   *gi.ArgInfo
 	Return *gi.TypeInfo
 	Hidden bool
+	Error  bool
 }
 
 func (arg *Argument) Obscured() []int {
@@ -113,7 +129,7 @@ func (arg *Argument) TypeInfo() *gi.TypeInfo {
 }
 
 func (arg *Argument) IsInput() bool {
-	return arg.Return == nil && !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
+	return arg.Return == nil && !arg.Error && !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
 }
 
 func (arg *Argument) IsCInput() bool {
@@ -128,10 +144,17 @@ func (arg *Argument) GoName() string {
 	if arg.Return != nil {
 		return "r"
 	}
+	if arg.Error {
+		return "err"
+	}
 	return arg.Info.GetName()
 }
 
 func (arg *Argument) GoType() string {
+	if arg.Error {
+		return "error"
+	}
+
 	info := arg.TypeInfo()
 
 	var buf strings.Builder
@@ -157,13 +180,27 @@ func (arg *Argument) GoType() string {
 
 func (arg *Argument) CInput() string {
 	var address string
-	if arg.Info.GetDirection() != gi.DirectionIn {
+	if arg.Error || arg.Info.GetDirection() != gi.DirectionIn {
 		address = "&"
 	}
 	return fmt.Sprintf("%v%v", address, arg.CName())
 }
 
+func (arg *Argument) CName() string {
+	if arg.Return != nil {
+		return "cr"
+	}
+	if arg.Error {
+		return "gerr"
+	}
+	return fmt.Sprintf("arg%v", arg.Index)
+}
+
 func (arg *Argument) CType() string {
+	if arg.Error {
+		return "*C.GError"
+	}
+
 	info := arg.TypeInfo()
 
 	var buf strings.Builder
@@ -192,14 +229,15 @@ func (arg *Argument) CType() string {
 	return buf.String()
 }
 
-func (arg *Argument) CName() string {
-	if arg.Return != nil {
-		return "cr"
-	}
-	return fmt.Sprintf("arg%v", arg.Index)
-}
-
 func (arg *Argument) ConvertToGo() string {
+	if arg.Error {
+		// TODO: Move the error into Go so that it can be freed by the
+		// garbage collector. This is an exception to the manual memory
+		// management because handling it when it's hidden behind an error
+		// interface would be too gosh darn annoying otherwise.
+		return fmt.Sprintf("%v = (*g.Error)(unsafe.Pointer(%v))", arg.GoName(), arg.CName())
+	}
+
 	ti := arg.TypeInfo()
 	switch tag := ti.GetTag(); tag {
 	case gi.TypeTagBoolean:
@@ -217,13 +255,21 @@ func (arg *Argument) ConvertToGo() string {
 }
 
 func (arg *Argument) ConvertToC() string {
+	if arg.Error {
+		return fmt.Sprintf("var %v %v", arg.CName(), arg.CType())
+	}
+
 	ti := arg.TypeInfo()
 	switch tag := ti.GetTag(); tag {
 	case gi.TypeTagBoolean:
 		return fmt.Sprintf("var %v C.gboolean\nif %v { %v = 1 }", arg.CName(), arg.GoName(), arg.CName())
 
 	case gi.TypeTagUtf:
-		return fmt.Sprintf("%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))", arg.CName(), arg.GoName(), arg.CName())
+		var free string
+		if arg.Info.GetOwnershipTransfer() == gi.TransferNothing {
+			free = fmt.Sprintf("\ndefer C.free(unsafe.Pointer(%v))", arg.CName())
+		}
+		return fmt.Sprintf("%v := C.CString(%v)%v", arg.CName(), arg.GoName(), free)
 
 	case gi.TypeTagInterface:
 		return fmt.Sprintf("%v = (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())

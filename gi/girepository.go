@@ -182,6 +182,10 @@ func (info *CallableInfo) GetReturnType() *TypeInfo {
 	return (*TypeInfo)(unsafe.Pointer(C.gi_callable_info_get_return_type(info.c())))
 }
 
+func (info *CallableInfo) CanThrowGerror() bool {
+	return C.gi_callable_info_can_throw_gerror(info.c()) != 0
+}
+
 var TypeFunctionInfo = g.ToType[FunctionInfo](uint64(C.gi_function_info_get_type()))
 
 type FunctionInfo struct {
@@ -383,6 +387,18 @@ func (info *ArgInfo) GetDirection() Direction {
 
 func (info *ArgInfo) IsSkip() bool {
 	return C.gi_arg_info_is_skip(info.c()) != 0
+}
+
+type Transfer int
+
+const (
+	TransferNothing Transfer = iota
+	TransferContainer
+	TransferEverything
+)
+
+func (info *ArgInfo) GetOwnershipTransfer() Transfer {
+	return Transfer(C.gi_arg_info_get_ownership_transfer(info.c()))
 }
 
 type TypeInfo struct {
