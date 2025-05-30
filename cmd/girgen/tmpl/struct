@@ -2,9 +2,6 @@
 	type {{.Type.GetName}} struct {
 		_ structs.HostLayout
 		_ [{{.Type.GetSize}}]byte
-		{{range $_, $field := .Type.GetFields}}
-			// {{$field.GetName}}
-		{{end}}
 	}
 
 	func (s *{{.Type.GetName}}) c() *C.{{.CTypeName}} {

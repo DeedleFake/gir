@@ -16,4 +16,8 @@ import()
 	{{with toStruct $info}}
 		{{$.Generate "struct" . nil}}
 	{{end}}
+
+	{{with toObject $info}}
+		{{$.Generate "object" . nil}}
+	{{end}}
 {{end}}

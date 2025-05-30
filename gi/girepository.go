@@ -248,11 +248,15 @@ func (info *RegisteredTypeInfo) GetTypeName() string {
 	return C.GoString(C.gi_registered_type_info_get_type_name(info.c()))
 }
 
+func (info *RegisteredTypeInfo) GetGType() g.Type[g.TypeInstance] {
+	return g.ToType[g.TypeInstance](uint64(C.gi_registered_type_info_get_g_type(info.c())))
+}
+
 var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
 type ObjectInfo struct {
 	_ structs.HostLayout
-	BaseInfo
+	RegisteredTypeInfo
 	_ [unsafe.Sizeof(*new(C.GIObjectInfo)) - unsafe.Sizeof(*new(C.GIBaseInfo))]byte
 }
 
@@ -279,6 +283,10 @@ func (info *ObjectInfo) GetMethods() iter.Seq2[uint, *FunctionInfo] {
 			}
 		}
 	}
+}
+
+func (info *ObjectInfo) GetParent() *ObjectInfo {
+	return (*ObjectInfo)(unsafe.Pointer(C.gi_object_info_get_parent(info.c())))
 }
 
 var TypeStructInfo = g.ToType[StructInfo](uint64(C.gi_struct_info_get_type()))

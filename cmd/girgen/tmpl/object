@@ -1,0 +1,13 @@
+type {{.Type.GetName}} struct {
+	_ structs.HostLayout
+	{{with .Type.GetParent}}{{.GetName}}{{end}}
+	{{with .InstanceSize}}_ [{{.}}]byte{{end}}
+}
+
+func (obj *{{.Type.GetName}}) c() *C.{{.CTypeName}} {
+	return (*C.{{.CTypeName}})(unsafe.Pointer(obj))
+}
+
+func (obj *{{.Type.GetName}}) As{{.CTypeName}}() *{{.Type.GetName}} {
+	return obj
+}

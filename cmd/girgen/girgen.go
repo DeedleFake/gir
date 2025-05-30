@@ -38,6 +38,11 @@ var (
 			c, _ := gi.TypeStructInfo.Check(info)
 			return c
 		},
+
+		"toObject": func(info *gi.BaseInfo) *gi.ObjectInfo {
+			c, _ := gi.TypeObjectInfo.Check(info)
+			return c
+		},
 	}
 )
 

@@ -63,6 +63,25 @@ func (t Type[T]) Check(obj TypeInstancer) (*T, bool) {
 	return (*T)(unsafe.Pointer(ti)), true
 }
 
+func (t Type[T]) Query() *TypeQuery {
+	var q TypeQuery
+	C.g_type_query(t.c(), q.c())
+	return &q
+}
+
+type TypeQuery struct {
+	_ structs.HostLayout
+	_ [unsafe.Sizeof(*new(C.GTypeQuery))]byte
+}
+
+func (q *TypeQuery) c() *C.GTypeQuery {
+	return (*C.GTypeQuery)(unsafe.Pointer(q))
+}
+
+func (q *TypeQuery) InstanceSize() uint {
+	return uint(q.c().instance_size)
+}
+
 type TypeClass struct {
 	_ structs.HostLayout
 	_ [unsafe.Sizeof(*new(C.GTypeClass))]byte

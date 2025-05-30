@@ -56,6 +56,22 @@ func (gen *Generator) CTypeName() string {
 	return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName())
 }
 
+func (gen *Generator) InstanceSize() uint {
+	if info, ok := gi.TypeObjectInfo.Check(gen.Type); ok {
+		size := info.GetGType().Query().InstanceSize()
+		if parent := info.GetParent(); parent != nil {
+			size -= parent.GetGType().Query().InstanceSize()
+		}
+		return size
+	}
+
+	if info, ok := gi.TypeRegisteredTypeInfo.Check(gen.Type); ok {
+		return info.GetGType().Query().InstanceSize()
+	}
+
+	panic(fmt.Errorf("can't get size for %v", gen.Type.AsGTypeInstance().TypeName()))
+}
+
 func (gen *Generator) Callable() *gi.CallableInfo {
 	return gen.Element.(interface{ AsGICallableInfo() *gi.CallableInfo }).AsGICallableInfo()
 }
