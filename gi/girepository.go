@@ -11,6 +11,7 @@ import "C"
 
 import (
 	"iter"
+	"structs"
 	"unsafe"
 
 	"deedles.dev/gir/g"
@@ -297,4 +298,15 @@ func (info *BaseInfo) GetContainer() *BaseInfo {
 
 func (info *ObjectInfo) GetRefFunctionName() string {
 	return C.GoString(C.gi_object_info_get_ref_function_name(info.c()))
+}
+
+type Argument struct {
+	_ structs.HostLayout
+	_ [unsafe.Sizeof(*new(C.GIArgument))]byte
+}
+
+func (info *TypeInfo) GetArrayLengthIndex() (uint, bool) {
+	var i C.uint
+	ok := C.gi_type_info_get_array_length_index(info.c(), &i)
+	return uint(i), ok != 0
 }

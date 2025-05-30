@@ -28,3 +28,8 @@ type Bytes struct {
 	_ structs.HostLayout
 	_ [unsafe.Sizeof(*new(C.GBytes))]byte
 }
+
+type OptionGroup struct {
+	_ structs.HostLayout
+	_ [unsafe.Sizeof(*new(C.GOptionGroup))]byte
+}

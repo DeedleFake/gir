@@ -22,7 +22,7 @@ func (args *Arguments) Load() {
 	var hide []int
 	for i, info := range callable.GetArgs() {
 		arg := Argument{
-			Generator: args.Generator,
+			Arguments: args,
 			Index:     i,
 			Info:      info,
 		}
@@ -94,7 +94,7 @@ func (args *Arguments) cOutput() *Argument {
 		r.Unref()
 		return nil
 	}
-	return &Argument{Generator: args.Generator, Return: r}
+	return &Argument{Arguments: args, Return: r}
 }
 
 func (args *Arguments) err() *Argument {
@@ -102,11 +102,11 @@ func (args *Arguments) err() *Argument {
 	if !r {
 		return nil
 	}
-	return &Argument{Generator: args.Generator, Error: true}
+	return &Argument{Arguments: args, Error: true}
 }
 
 type Argument struct {
-	*Generator
+	*Arguments
 
 	Index  uint
 	Info   *gi.ArgInfo
@@ -226,6 +226,16 @@ func (arg *Argument) ConvertToGo() string {
 		}
 		return fmt.Sprintf("%v = %v(%v%v)(unsafe.Pointer(%v%v))", arg.GoName(), deref, deref, arg.GoType(), addr, arg.CName())
 
+	case gi.TypeTagArray:
+		length, _ := info.GetArrayLengthIndex()
+		return fmt.Sprintf(
+			"%v = (*%v)(unsafe.Pointer(&unsafe.Slice(%v, %v)))",
+			arg.GoName(),
+			arg.GoType(),
+			arg.CName(),
+			arg.Args[length].CName(),
+		)
+
 	default:
 		return fmt.Sprintf("%v = (%v)(%v)", arg.GoName(), arg.GoType(), arg.CName())
 	}
@@ -257,6 +267,9 @@ func (arg *Argument) ConvertToC() string {
 			return fmt.Sprintf("%v := %v(%v)", arg.CName(), arg.CType(), arg.GoName())
 		}
 		return fmt.Sprintf("%v := (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())
+
+	case gi.TypeTagArray:
+		return fmt.Sprintf("%v := (*%v)(unsafe.Pointer(unsafe.SliceData(%v)))", arg.CName(), arg.CType(), arg.GoName())
 
 	default:
 		return fmt.Sprintf("%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
