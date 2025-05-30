@@ -24,6 +24,7 @@ var (
 	tmplFuncs = template.FuncMap{
 		"toCamelCase": util.ToCamelCase,
 		"toSnakeCase": util.ToSnakeCase,
+		"cTypeName":   CTypeName,
 
 		"parent": func(info *gi.ObjectInfo) parentInfo {
 			if parent := info.GetParent(); parent != nil {

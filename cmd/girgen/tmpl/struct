@@ -4,8 +4,8 @@
 		_ [{{.Type.GetSize}}]byte
 	}
 
-	func (s *{{.Type.GetName}}) c() *C.{{.CTypeName}} {
-		return (*C.{{.CTypeName}})(unsafe.Pointer(s))
+	func (s *{{.Type.GetName}}) c() *C.{{.Type | cTypeName}} {
+		return (*C.{{.Type | cTypeName}})(unsafe.Pointer(s))
 	}
 
 	{{range $_, $method := .Type.GetMethods}}

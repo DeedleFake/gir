@@ -14,6 +14,7 @@ import (
 type BaseInfoer interface {
 	g.TypeInstancer
 	GetName() string
+	GetNamespace() string
 	AsGIBaseInfo() *gi.BaseInfo
 }
 
@@ -63,11 +64,6 @@ func (gen *Generator) MethodPrefix() string {
 
 func (gen *Generator) MethodName(name string) string {
 	return fmt.Sprintf("%v_%v", gen.MethodPrefix(), name)
-}
-
-func (gen *Generator) CTypeName() string {
-	info := gi.TypeRegisteredTypeInfo.Cast(gen.Type)
-	return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName())
 }
 
 func (gen *Generator) InstanceSize() uint {
@@ -125,7 +121,7 @@ func (gen *Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 		buf.WriteString("Type")
 
 	case gi.TypeTagArray:
-		fmt.Fprintf(&buf, "INVALID(%v)", typeTagsGo[info.GetArrayType()])
+		fmt.Fprintf(&buf, "[]%v", gen.TypeInfoToGo(info.GetParamType(0)))
 
 	default:
 		buf.WriteString(typeTagsGo[tag])
@@ -151,8 +147,11 @@ func (gen *Generator) TypeInfoToC(info *gi.TypeInfo) string {
 		i := info.GetInterface()
 		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
 			buf.WriteString("C.")
-			buf.WriteString(i.GetTypeName())
+			buf.WriteString(CTypeName(i))
 		}
+
+	case gi.TypeTagArray:
+		fmt.Fprintf(&buf, "*%v", gen.TypeInfoToC(info.GetParamType(0)))
 
 	default:
 		buf.WriteString(typeTagsC[tag])

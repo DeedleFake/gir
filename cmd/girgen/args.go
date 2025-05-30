@@ -146,7 +146,7 @@ func (arg *Argument) GoName() string {
 	if arg.Error {
 		return "err"
 	}
-	return arg.Info.GetName()
+	return util.AvoidKeywords(arg.Info.GetName())
 }
 
 func (arg *Argument) GoType() string {
@@ -154,7 +154,11 @@ func (arg *Argument) GoType() string {
 		return "error"
 	}
 
-	return arg.TypeInfoToGo(arg.TypeInfo())
+	var pointer string
+	if arg.Info != nil && arg.Info.GetDirection() == gi.DirectionInout {
+		pointer = "*"
+	}
+	return fmt.Sprintf("%v%v", pointer, arg.TypeInfoToGo(arg.TypeInfo()))
 }
 
 func (arg *Argument) CInput() string {
@@ -180,7 +184,11 @@ func (arg *Argument) CType() string {
 		return "*C.GError"
 	}
 
-	return arg.TypeInfoToC(arg.TypeInfo())
+	var pointer string
+	if arg.Info.GetDirection() == gi.DirectionInout {
+		pointer = "*"
+	}
+	return fmt.Sprintf("%v%v", pointer, arg.TypeInfoToC(arg.TypeInfo()))
 }
 
 func (arg *Argument) ConvertToGo() string {
@@ -216,11 +224,14 @@ func (arg *Argument) ConvertToC() string {
 	if arg.Error {
 		return fmt.Sprintf("var %v %v", arg.CName(), arg.CType())
 	}
+	if !arg.IsInput() {
+		return fmt.Sprintf("var %v %v", arg.CName(), arg.CType())
+	}
 
 	ti := arg.TypeInfo()
 	switch tag := ti.GetTag(); tag {
 	case gi.TypeTagBoolean:
-		return fmt.Sprintf("var %v C.gboolean\nif %v { %v = 1 }", arg.CName(), arg.GoName(), arg.CName())
+		return fmt.Sprintf("var %v %v\nif %v { %v = 1 }", arg.CName(), arg.CType(), arg.GoName(), arg.CName())
 
 	case gi.TypeTagUtf8, gi.TypeTagFilename:
 		var free string

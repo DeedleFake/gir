@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+
+	"deedles.dev/gir/internal/util"
+)
+
 var (
 	typeTagsGo = [...]string{
 		"INVALID(Void)",      // Void
@@ -61,3 +67,7 @@ type typeInstanceParentInfo struct{}
 
 func (typeInstanceParentInfo) GetNamespace() string { return "GObject" }
 func (typeInstanceParentInfo) GetName() string      { return "TypeInstance" }
+
+func CTypeName(info BaseInfoer) string {
+	return fmt.Sprintf("%v%v", util.ParseCPrefix(info.GetNamespace()), info.GetName())
+}
