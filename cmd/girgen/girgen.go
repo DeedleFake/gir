@@ -96,7 +96,7 @@ func main() {
 
 	r := gi.RepositoryNew()
 
-	tl, err := r.Require(config.Namespace, config.Version, gi.RepositoryLoadFlagNone)
+	tl, err := r.Require(config.Namespace, config.Version, gi.RepositoryLoadFlagsNone)
 	if err != nil {
 		slog.Error("failed to open typelib", "namespace", config.Namespace, "version", config.Version, "err", err)
 		os.Exit(1)

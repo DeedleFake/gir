@@ -20,13 +20,6 @@ func RepositoryNew() *Repository {
 	return (*Repository)(unsafe.Pointer(C.gi_repository_new()))
 }
 
-type RepositoryLoadFlags int
-
-const (
-	RepositoryLoadFlagNone RepositoryLoadFlags = iota
-	RepositoryLoadFlagLazy
-)
-
 func (r *Repository) Require(namespace, version string, flags RepositoryLoadFlags) (*Typelib, error) {
 	cnamespace := C.CString(namespace)
 	defer C.free(unsafe.Pointer(cnamespace))
@@ -145,18 +138,6 @@ func (info *CallableInfo) CanThrowGerror() bool {
 	return C.gi_callable_info_can_throw_gerror(info.c()) != 0
 }
 
-type FunctionInfoFlags int
-
-const (
-	FunctionInfoFlagsNone FunctionInfoFlags = 0
-	FunctionIsMethod      FunctionInfoFlags = 1 << (iota - 1)
-	FunctionIsConstructor
-	FunctionIsGetter
-	FunctionIsSetter
-	FunctionWrapsVFunc
-	FunctionIsAsync
-)
-
 func (info *FunctionInfo) GetFlags() FunctionInfoFlags {
 	return FunctionInfoFlags(C.gi_function_info_get_flags(info.c()))
 }
@@ -250,14 +231,6 @@ func (info *ArgInfo) IsReturnValue() bool {
 	return C.gi_arg_info_is_return_value(info.c()) != 0
 }
 
-type Direction int
-
-const (
-	DirectionIn Direction = iota
-	DirectionOut
-	DirectionInout
-)
-
 func (info *ArgInfo) GetDirection() Direction {
 	return Direction(C.gi_arg_info_get_direction(info.c()))
 }
@@ -266,70 +239,8 @@ func (info *ArgInfo) IsSkip() bool {
 	return C.gi_arg_info_is_skip(info.c()) != 0
 }
 
-type Transfer int
-
-const (
-	TransferNothing Transfer = iota
-	TransferContainer
-	TransferEverything
-)
-
 func (info *ArgInfo) GetOwnershipTransfer() Transfer {
 	return Transfer(C.gi_arg_info_get_ownership_transfer(info.c()))
-}
-
-type TypeTag int
-
-const (
-	TypeTagVoid TypeTag = iota
-	TypeTagBoolean
-	TypeTagInt8
-	TypeTagUint8
-	TypeTagInt16
-	TypeTagUint16
-	TypeTagInt32
-	TypeTagUint32
-	TypeTagInt64
-	TypeTagUint64
-	TypeTagFloat
-	TypeTagDouble
-	TypeTagGtype
-	TypeTagUtf
-	TypeTagFilename
-	TypeTagArray
-	TypeTagInterface
-	TypeTagGlist
-	TypeTagGslist
-	TypeTagGhash
-	TypeTagError
-	TypeTagUnichar
-)
-
-func (tag TypeTag) String() string {
-	return [...]string{
-		"Void",
-		"Boolean",
-		"Int",
-		"Uint",
-		"Int",
-		"Uint",
-		"Int",
-		"Uint",
-		"Int",
-		"Uint",
-		"Float",
-		"Double",
-		"Gtype",
-		"Utf",
-		"Filename",
-		"Array",
-		"Interface",
-		"Glist",
-		"Gslist",
-		"Ghash",
-		"Error",
-		"Unichar",
-	}[tag]
 }
 
 func (info *TypeInfo) GetTag() TypeTag {

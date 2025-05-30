@@ -31,6 +31,15 @@ func (obj *ArgInfo) AsGIArgInfo() *ArgInfo {
 	return obj
 }
 
+type ArrayType int64
+
+const (
+	ArrayTypeC         ArrayType = 0
+	ArrayTypeArray     ArrayType = 1
+	ArrayTypePtrArray  ArrayType = 2
+	ArrayTypeByteArray ArrayType = 3
+)
+
 type AttributeIter struct {
 	_ structs.HostLayout
 	_ [40]byte
@@ -110,6 +119,14 @@ func (obj *ConstantInfo) AsGIConstantInfo() *ConstantInfo {
 	return obj
 }
 
+type Direction int64
+
+const (
+	DirectionIn    Direction = 0
+	DirectionOut   Direction = 1
+	DirectionInout Direction = 2
+)
+
 var TypeEnumInfo = g.ToType[EnumInfo](uint64(C.gi_enum_info_get_type()))
 
 type EnumInfo struct {
@@ -139,6 +156,13 @@ func (obj *FieldInfo) c() *C.GIFieldInfo {
 func (obj *FieldInfo) AsGIFieldInfo() *FieldInfo {
 	return obj
 }
+
+type FieldInfoFlags int64
+
+const (
+	FieldInfoFlagsReadable FieldInfoFlags = 1
+	FieldInfoFlagsWritable FieldInfoFlags = 2
+)
 
 var TypeFlagsInfo = g.ToType[FlagsInfo](uint64(C.gi_flags_info_get_type()))
 
@@ -170,6 +194,17 @@ func (obj *FunctionInfo) AsGIFunctionInfo() *FunctionInfo {
 	return obj
 }
 
+type FunctionInfoFlags int64
+
+const (
+	FunctionInfoFlagsIsMethod      FunctionInfoFlags = 1
+	FunctionInfoFlagsIsConstructor FunctionInfoFlags = 2
+	FunctionInfoFlagsIsGetter      FunctionInfoFlags = 4
+	FunctionInfoFlagsIsSetter      FunctionInfoFlags = 8
+	FunctionInfoFlagsWrapsVfunc    FunctionInfoFlags = 16
+	FunctionInfoFlagsIsAsync       FunctionInfoFlags = 32
+)
+
 var TypeInterfaceInfo = g.ToType[InterfaceInfo](uint64(C.gi_interface_info_get_type()))
 
 type InterfaceInfo struct {
@@ -184,6 +219,14 @@ func (obj *InterfaceInfo) c() *C.GIInterfaceInfo {
 func (obj *InterfaceInfo) AsGIInterfaceInfo() *InterfaceInfo {
 	return obj
 }
+
+type InvokeError int64
+
+const (
+	InvokeErrorFailed           InvokeError = 0
+	InvokeErrorSymbolNotFound   InvokeError = 1
+	InvokeErrorArgumentMismatch InvokeError = 2
+)
 
 var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
@@ -246,6 +289,32 @@ func (obj *Repository) AsGIRepository() *Repository {
 	return obj
 }
 
+type RepositoryError int64
+
+const (
+	RepositoryErrorTypelibNotFound          RepositoryError = 0
+	RepositoryErrorNamespaceMismatch        RepositoryError = 1
+	RepositoryErrorNamespaceVersionConflict RepositoryError = 2
+	RepositoryErrorLibraryNotFound          RepositoryError = 3
+)
+
+type RepositoryLoadFlags int64
+
+const (
+	RepositoryLoadFlagsNone RepositoryLoadFlags = 0
+	RepositoryLoadFlagsLazy RepositoryLoadFlags = 1
+)
+
+type ScopeType int64
+
+const (
+	ScopeTypeInvalid  ScopeType = 0
+	ScopeTypeCall     ScopeType = 1
+	ScopeTypeAsync    ScopeType = 2
+	ScopeTypeNotified ScopeType = 3
+	ScopeTypeForever  ScopeType = 4
+)
+
 var TypeSignalInfo = g.ToType[SignalInfo](uint64(C.gi_signal_info_get_type()))
 
 type SignalInfo struct {
@@ -276,6 +345,16 @@ func (obj *StructInfo) AsGIStructInfo() *StructInfo {
 	return obj
 }
 
+const TypeTagNTypes = "NOT IMPLEMENTED"
+
+type Transfer int64
+
+const (
+	TransferNothing    Transfer = 0
+	TransferContainer  Transfer = 1
+	TransferEverything Transfer = 2
+)
+
 var TypeTypeInfo = g.ToType[TypeInfo](uint64(C.gi_type_info_get_type()))
 
 type TypeInfo struct {
@@ -291,6 +370,33 @@ func (obj *TypeInfo) c() *C.GITypeInfo {
 func (obj *TypeInfo) AsGITypeInfo() *TypeInfo {
 	return obj
 }
+
+type TypeTag int64
+
+const (
+	TypeTagVoid      TypeTag = 0
+	TypeTagBoolean   TypeTag = 1
+	TypeTagInt8      TypeTag = 2
+	TypeTagUint8     TypeTag = 3
+	TypeTagInt16     TypeTag = 4
+	TypeTagUint16    TypeTag = 5
+	TypeTagInt32     TypeTag = 6
+	TypeTagUint32    TypeTag = 7
+	TypeTagInt64     TypeTag = 8
+	TypeTagUint64    TypeTag = 9
+	TypeTagFloat     TypeTag = 10
+	TypeTagDouble    TypeTag = 11
+	TypeTagGtype     TypeTag = 12
+	TypeTagUtf8      TypeTag = 13
+	TypeTagFilename  TypeTag = 14
+	TypeTagArray     TypeTag = 15
+	TypeTagInterface TypeTag = 16
+	TypeTagGlist     TypeTag = 17
+	TypeTagGslist    TypeTag = 18
+	TypeTagGhash     TypeTag = 19
+	TypeTagError     TypeTag = 20
+	TypeTagUnichar   TypeTag = 21
+)
 
 type Typelib struct {
 	_ structs.HostLayout
@@ -311,14 +417,12 @@ func TypelibNewFromBytes(bytes *g.Bytes) (r *Typelib, err error) {
 }
 
 func (s *Typelib) GetNamespace() (r string) {
-
 	cr := C.gi_typelib_get_namespace(s.c())
 	r = C.GoString(cr)
 	return
 }
 
 func (s *Typelib) Ref() (r *Typelib) {
-
 	cr := C.gi_typelib_ref(s.c())
 	r = (*Typelib)(unsafe.Pointer(cr))
 	return
@@ -335,9 +439,7 @@ func (s *Typelib) Symbol(symbol_name string) (symbol unsafe.Pointer, r bool) {
 }
 
 func (s *Typelib) Unref() {
-
 	C.gi_typelib_unref(s.c())
-
 	return
 }
 
@@ -386,6 +488,14 @@ func (obj *VFuncInfo) c() *C.GIVFuncInfo {
 func (obj *VFuncInfo) AsGIVFuncInfo() *VFuncInfo {
 	return obj
 }
+
+type VFuncInfoFlags int64
+
+const (
+	VFuncInfoFlagsChainUp     VFuncInfoFlags = 1
+	VFuncInfoFlagsOverride    VFuncInfoFlags = 2
+	VFuncInfoFlagsNotOverride VFuncInfoFlags = 4
+)
 
 var TypeValueInfo = g.ToType[ValueInfo](uint64(C.gi_value_info_get_type()))
 

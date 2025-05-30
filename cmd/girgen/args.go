@@ -201,7 +201,7 @@ func (arg *Argument) ConvertToGo() string {
 	case gi.TypeTagBoolean:
 		return fmt.Sprintf("%v = %v != 0", arg.GoName(), arg.CName())
 
-	case gi.TypeTagUtf:
+	case gi.TypeTagUtf8:
 		return fmt.Sprintf("%v = C.GoString(%v)", arg.GoName(), arg.CName())
 
 	case gi.TypeTagInterface:
@@ -222,7 +222,7 @@ func (arg *Argument) ConvertToC() string {
 	case gi.TypeTagBoolean:
 		return fmt.Sprintf("var %v C.gboolean\nif %v { %v = 1 }", arg.CName(), arg.GoName(), arg.CName())
 
-	case gi.TypeTagUtf:
+	case gi.TypeTagUtf8:
 		var free string
 		if arg.Info.GetOwnershipTransfer() == gi.TransferNothing {
 			free = fmt.Sprintf("\ndefer C.free(unsafe.Pointer(%v))", arg.CName())
