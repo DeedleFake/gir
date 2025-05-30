@@ -208,6 +208,9 @@ func (arg *Argument) ConvertToGo() string {
 	case gi.TypeTagUtf:
 		return fmt.Sprintf("%v = C.GoString(%v)", arg.GoName(), arg.CName())
 
+	case gi.TypeTagInterface:
+		return fmt.Sprintf("%v = (%v)(unsafe.Pointer(%v))", arg.GoName(), arg.GoType(), arg.CName())
+
 	default:
 		return fmt.Sprintf("%v = (%v)(%v)", arg.GoName(), arg.GoType(), arg.CName())
 	}
@@ -221,6 +224,9 @@ func (arg *Argument) ConvertToC() string {
 
 	case gi.TypeTagUtf:
 		return fmt.Sprintf("%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))", arg.CName(), arg.GoName(), arg.CName())
+
+	case gi.TypeTagInterface:
+		return fmt.Sprintf("%v = (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())
 
 	default:
 		return fmt.Sprintf("%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
