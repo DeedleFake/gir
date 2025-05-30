@@ -204,8 +204,8 @@ func (arg *Argument) ConvertToGo() string {
 		return fmt.Sprintf("%v = (*%v%vError)(unsafe.Pointer(%v))", arg.GoName(), pkg, dot, arg.CName())
 	}
 
-	ti := arg.TypeInfo()
-	switch tag := ti.GetTag(); tag {
+	info := arg.TypeInfo()
+	switch tag := info.GetTag(); tag {
 	case gi.TypeTagBoolean:
 		return fmt.Sprintf("%v = %v != 0", arg.GoName(), arg.CName())
 
@@ -213,7 +213,13 @@ func (arg *Argument) ConvertToGo() string {
 		return fmt.Sprintf("%v = C.GoString(%v)", arg.GoName(), arg.CName())
 
 	case gi.TypeTagInterface:
-		return fmt.Sprintf("%v = (%v)(unsafe.Pointer(%v))", arg.GoName(), arg.GoType(), arg.CName())
+		deref := "*"
+		addr := "&"
+		if info.IsPointer() {
+			deref = ""
+			addr = ""
+		}
+		return fmt.Sprintf("%v = %v(%v%v)(unsafe.Pointer(%v%v))", arg.GoName(), deref, deref, arg.GoType(), addr, arg.CName())
 
 	default:
 		return fmt.Sprintf("%v = (%v)(%v)", arg.GoName(), arg.GoType(), arg.CName())
@@ -228,8 +234,8 @@ func (arg *Argument) ConvertToC() string {
 		return fmt.Sprintf("var %v %v", arg.CName(), arg.CType())
 	}
 
-	ti := arg.TypeInfo()
-	switch tag := ti.GetTag(); tag {
+	info := arg.TypeInfo()
+	switch tag := info.GetTag(); tag {
 	case gi.TypeTagBoolean:
 		return fmt.Sprintf("var %v %v\nif %v { %v = 1 }", arg.CName(), arg.CType(), arg.GoName(), arg.CName())
 
