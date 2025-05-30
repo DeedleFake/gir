@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unsafe"
 
 	"deedles.dev/gir/g"
 	"deedles.dev/gir/gi"
@@ -68,9 +69,9 @@ func (gen *Generator) InstanceSize() uint {
 	if info, ok := gi.TypeObjectInfo.Check(gen.Type); ok {
 		size := info.GetGType().Query().InstanceSize()
 		if parent := info.GetParent(); parent != nil {
-			size -= parent.GetGType().Query().InstanceSize()
+			return size - parent.GetGType().Query().InstanceSize()
 		}
-		return size
+		return size - uint(unsafe.Sizeof(*new(g.TypeInstance)))
 	}
 
 	if info, ok := gi.TypeRegisteredTypeInfo.Check(gen.Type); ok {

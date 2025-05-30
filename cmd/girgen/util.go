@@ -51,3 +51,13 @@ var (
 		"INVALID(Unichar)",   // Unichar
 	}
 )
+
+type parentInfo interface {
+	GetNamespace() string
+	GetName() string
+}
+
+type typeInstanceParentInfo struct{}
+
+func (typeInstanceParentInfo) GetNamespace() string { return "GObject" }
+func (typeInstanceParentInfo) GetName() string      { return "TypeInstance" }

@@ -25,6 +25,13 @@ var (
 		"toCamelCase": util.ToCamelCase,
 		"toSnakeCase": util.ToSnakeCase,
 
+		"parent": func(info *gi.ObjectInfo) parentInfo {
+			if parent := info.GetParent(); parent != nil {
+				return parent
+			}
+			return typeInstanceParentInfo{}
+		},
+
 		"isClass": func(name string) bool {
 			return strings.HasSuffix(name, "Class")
 		},

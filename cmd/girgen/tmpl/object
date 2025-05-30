@@ -1,6 +1,6 @@
 type {{.Type.GetName}} struct {
 	_ structs.HostLayout
-	{{with .Type.GetParent}}{{with $.PackageFor .GetNamespace}}{{.}}.{{end}}{{.GetName}}{{end}}
+	{{with parent .Type}}{{with $.PackageFor .GetNamespace}}{{.}}.{{end}}{{.GetName}}{{end}}
 	{{with .InstanceSize}}_ [{{.}}]byte{{end}}
 }
 
