@@ -65,3 +65,58 @@ func (gen *Generator) Arguments() *Arguments {
 	args.Load()
 	return &args
 }
+
+func (gen *Generator) TypeInfoToGo(info *gi.TypeInfo) string {
+	var buf strings.Builder
+	switch tag := info.GetTag(); tag {
+	case gi.TypeTagVoid:
+		return "unsafe.Pointer"
+
+	case gi.TypeTagInterface:
+		if info.IsPointer() {
+			buf.WriteByte('*')
+		}
+		i := info.GetInterface()
+		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
+			localPrefix := strings.ToLower(gen.CPrefix())
+			typePrefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(i.GetNamespace())))
+			if localPrefix != typePrefix {
+				buf.WriteString(typePrefix)
+				buf.WriteByte('.')
+			}
+			buf.WriteString(i.GetName())
+		}
+
+	default:
+		buf.WriteString(typeTagsGo[tag])
+	}
+
+	return buf.String()
+}
+
+func (gen *Generator) TypeInfoToC(info *gi.TypeInfo) string {
+	var buf strings.Builder
+	switch tag := info.GetTag(); tag {
+	case gi.TypeTagVoid:
+		if info.IsPointer() {
+			buf.WriteString("unsafe.Pointer")
+			break
+		}
+		buf.WriteString(typeTagsC[tag])
+
+	case gi.TypeTagInterface:
+		if info.IsPointer() {
+			buf.WriteByte('*')
+		}
+		i := info.GetInterface()
+		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
+			buf.WriteString("C.")
+			buf.WriteString(i.GetTypeName())
+		}
+
+	default:
+		buf.WriteString(typeTagsC[tag])
+	}
+
+	return buf.String()
+}

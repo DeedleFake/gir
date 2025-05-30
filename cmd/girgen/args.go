@@ -5,7 +5,6 @@ import (
 	"iter"
 	"runtime"
 	"slices"
-	"strings"
 
 	"deedles.dev/gir/gi"
 	"deedles.dev/gir/internal/util"
@@ -155,27 +154,7 @@ func (arg *Argument) GoType() string {
 		return "error"
 	}
 
-	info := arg.TypeInfo()
-
-	var buf strings.Builder
-	switch tag := info.GetTag(); tag {
-	case gi.TypeTagVoid:
-		return "unsafe.Pointer"
-
-	case gi.TypeTagInterface:
-		if info.IsPointer() {
-			buf.WriteByte('*')
-		}
-		i := info.GetInterface()
-		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
-			buf.WriteString(arg.RegisteredTypeToGo(i))
-		}
-
-	default:
-		buf.WriteString(typeTagsGo[tag])
-	}
-
-	return buf.String()
+	return arg.TypeInfoToGo(arg.TypeInfo())
 }
 
 func (arg *Argument) CInput() string {
@@ -201,32 +180,7 @@ func (arg *Argument) CType() string {
 		return "*C.GError"
 	}
 
-	info := arg.TypeInfo()
-
-	var buf strings.Builder
-	switch tag := info.GetTag(); tag {
-	case gi.TypeTagVoid:
-		if info.IsPointer() {
-			buf.WriteString("unsafe.Pointer")
-			break
-		}
-		buf.WriteString(typeTagsC[tag])
-
-	case gi.TypeTagInterface:
-		if info.IsPointer() {
-			buf.WriteByte('*')
-		}
-		i := info.GetInterface()
-		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
-			buf.WriteString("C.")
-			buf.WriteString(i.GetTypeName())
-		}
-
-	default:
-		buf.WriteString(typeTagsC[tag])
-	}
-
-	return buf.String()
+	return arg.TypeInfoToC(arg.TypeInfo())
 }
 
 func (arg *Argument) ConvertToGo() string {
@@ -277,16 +231,6 @@ func (arg *Argument) ConvertToC() string {
 	default:
 		return fmt.Sprintf("%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
 	}
-}
-
-func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {
-	localPrefix := strings.ToLower(gen.CPrefix()) + "."
-	typePrefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(info.GetNamespace()))) + "."
-	if localPrefix == typePrefix {
-		typePrefix = ""
-	}
-
-	return typePrefix + info.GetName()
 }
 
 func argsGoInput(seq iter.Seq[*Argument]) iter.Seq[string] {
