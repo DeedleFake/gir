@@ -47,6 +47,14 @@ func (gen *Generator) CPrefix() string {
 	return util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace))
 }
 
+func (gen *Generator) PackageFor(namespace string) string {
+	pkg := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(namespace)))
+	if pkg == gen.Package() {
+		return ""
+	}
+	return pkg
+}
+
 func (gen *Generator) MethodName(tname, mname string) string {
 	return util.MethodName(gen.CPrefix(), tname, mname)
 }
@@ -94,10 +102,9 @@ func (gen *Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 		}
 		i := info.GetInterface()
 		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
-			localPrefix := strings.ToLower(gen.CPrefix())
-			typePrefix := strings.ToLower(util.ParseCPrefix(gen.Repo.GetCPrefix(i.GetNamespace())))
-			if localPrefix != typePrefix {
-				buf.WriteString(typePrefix)
+			pkg := gen.PackageFor(i.GetNamespace())
+			if pkg != "" {
+				buf.WriteString(pkg)
 				buf.WriteByte('.')
 			}
 			buf.WriteString(i.GetName())
