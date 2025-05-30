@@ -163,7 +163,7 @@ func (arg *Argument) GoType() string {
 
 func (arg *Argument) CInput() string {
 	var address string
-	if arg.Error || arg.Info.GetDirection() != gi.DirectionIn {
+	if arg.Error || arg.Info.GetDirection() == gi.DirectionOut {
 		address = "&"
 	}
 	return fmt.Sprintf("%v%v", address, arg.CName())
