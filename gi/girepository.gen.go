@@ -9,6 +9,7 @@ package gi
 import "C"
 
 import (
+	"strings"
 	"structs"
 	"unsafe"
 
@@ -39,6 +40,31 @@ const (
 	ArrayTypePtrArray  ArrayType = 2
 	ArrayTypeByteArray ArrayType = 3
 )
+
+var stringsArrayType = [...]string{
+	0: "C",
+	1: "Array",
+	2: "PtrArray",
+	3: "ByteArray",
+}
+
+func (v ArrayType) String() string {
+	if v == 0 {
+		return stringsArrayType[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsArrayType[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsArrayType[2])
+	}
+	if v&3 != 0 {
+		r = append(r, stringsArrayType[3])
+	}
+	return strings.Join(r, ",")
+}
 
 type AttributeIter struct {
 	_ structs.HostLayout
@@ -127,6 +153,27 @@ const (
 	DirectionInout Direction = 2
 )
 
+var stringsDirection = [...]string{
+	0: "In",
+	1: "Out",
+	2: "Inout",
+}
+
+func (v Direction) String() string {
+	if v == 0 {
+		return stringsDirection[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsDirection[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsDirection[2])
+	}
+	return strings.Join(r, ",")
+}
+
 var TypeEnumInfo = g.ToType[EnumInfo](uint64(C.gi_enum_info_get_type()))
 
 type EnumInfo struct {
@@ -163,6 +210,26 @@ const (
 	FieldInfoFlagsReadable FieldInfoFlags = 1
 	FieldInfoFlagsWritable FieldInfoFlags = 2
 )
+
+var stringsFieldInfoFlags = [...]string{
+	1: "Readable",
+	2: "Writable",
+}
+
+func (v FieldInfoFlags) String() string {
+	if v == 0 {
+		return stringsFieldInfoFlags[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsFieldInfoFlags[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsFieldInfoFlags[2])
+	}
+	return strings.Join(r, ",")
+}
 
 var TypeFlagsInfo = g.ToType[FlagsInfo](uint64(C.gi_flags_info_get_type()))
 
@@ -205,6 +272,42 @@ const (
 	FunctionInfoFlagsIsAsync       FunctionInfoFlags = 32
 )
 
+var stringsFunctionInfoFlags = [...]string{
+	1:  "IsMethod",
+	2:  "IsConstructor",
+	4:  "IsGetter",
+	8:  "IsSetter",
+	16: "WrapsVfunc",
+	32: "IsAsync",
+}
+
+func (v FunctionInfoFlags) String() string {
+	if v == 0 {
+		return stringsFunctionInfoFlags[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsFunctionInfoFlags[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsFunctionInfoFlags[2])
+	}
+	if v&4 != 0 {
+		r = append(r, stringsFunctionInfoFlags[4])
+	}
+	if v&8 != 0 {
+		r = append(r, stringsFunctionInfoFlags[8])
+	}
+	if v&16 != 0 {
+		r = append(r, stringsFunctionInfoFlags[16])
+	}
+	if v&32 != 0 {
+		r = append(r, stringsFunctionInfoFlags[32])
+	}
+	return strings.Join(r, ",")
+}
+
 var TypeInterfaceInfo = g.ToType[InterfaceInfo](uint64(C.gi_interface_info_get_type()))
 
 type InterfaceInfo struct {
@@ -227,6 +330,27 @@ const (
 	InvokeErrorSymbolNotFound   InvokeError = 1
 	InvokeErrorArgumentMismatch InvokeError = 2
 )
+
+var stringsInvokeError = [...]string{
+	0: "Failed",
+	1: "SymbolNotFound",
+	2: "ArgumentMismatch",
+}
+
+func (v InvokeError) String() string {
+	if v == 0 {
+		return stringsInvokeError[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsInvokeError[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsInvokeError[2])
+	}
+	return strings.Join(r, ",")
+}
 
 var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
@@ -298,12 +422,54 @@ const (
 	RepositoryErrorLibraryNotFound          RepositoryError = 3
 )
 
+var stringsRepositoryError = [...]string{
+	0: "TypelibNotFound",
+	1: "NamespaceMismatch",
+	2: "NamespaceVersionConflict",
+	3: "LibraryNotFound",
+}
+
+func (v RepositoryError) String() string {
+	if v == 0 {
+		return stringsRepositoryError[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsRepositoryError[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsRepositoryError[2])
+	}
+	if v&3 != 0 {
+		r = append(r, stringsRepositoryError[3])
+	}
+	return strings.Join(r, ",")
+}
+
 type RepositoryLoadFlags int64
 
 const (
 	RepositoryLoadFlagsNone RepositoryLoadFlags = 0
 	RepositoryLoadFlagsLazy RepositoryLoadFlags = 1
 )
+
+var stringsRepositoryLoadFlags = [...]string{
+	0: "None",
+	1: "Lazy",
+}
+
+func (v RepositoryLoadFlags) String() string {
+	if v == 0 {
+		return stringsRepositoryLoadFlags[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsRepositoryLoadFlags[1])
+	}
+	return strings.Join(r, ",")
+}
 
 type ScopeType int64
 
@@ -314,6 +480,35 @@ const (
 	ScopeTypeNotified ScopeType = 3
 	ScopeTypeForever  ScopeType = 4
 )
+
+var stringsScopeType = [...]string{
+	0: "Invalid",
+	1: "Call",
+	2: "Async",
+	3: "Notified",
+	4: "Forever",
+}
+
+func (v ScopeType) String() string {
+	if v == 0 {
+		return stringsScopeType[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsScopeType[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsScopeType[2])
+	}
+	if v&3 != 0 {
+		r = append(r, stringsScopeType[3])
+	}
+	if v&4 != 0 {
+		r = append(r, stringsScopeType[4])
+	}
+	return strings.Join(r, ",")
+}
 
 var TypeSignalInfo = g.ToType[SignalInfo](uint64(C.gi_signal_info_get_type()))
 
@@ -354,6 +549,27 @@ const (
 	TransferContainer  Transfer = 1
 	TransferEverything Transfer = 2
 )
+
+var stringsTransfer = [...]string{
+	0: "Nothing",
+	1: "Container",
+	2: "Everything",
+}
+
+func (v Transfer) String() string {
+	if v == 0 {
+		return stringsTransfer[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsTransfer[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsTransfer[2])
+	}
+	return strings.Join(r, ",")
+}
 
 var TypeTypeInfo = g.ToType[TypeInfo](uint64(C.gi_type_info_get_type()))
 
@@ -397,6 +613,103 @@ const (
 	TypeTagError     TypeTag = 20
 	TypeTagUnichar   TypeTag = 21
 )
+
+var stringsTypeTag = [...]string{
+	0:  "Void",
+	1:  "Boolean",
+	2:  "Int8",
+	3:  "Uint8",
+	4:  "Int16",
+	5:  "Uint16",
+	6:  "Int32",
+	7:  "Uint32",
+	8:  "Int64",
+	9:  "Uint64",
+	10: "Float",
+	11: "Double",
+	12: "Gtype",
+	13: "Utf8",
+	14: "Filename",
+	15: "Array",
+	16: "Interface",
+	17: "Glist",
+	18: "Gslist",
+	19: "Ghash",
+	20: "Error",
+	21: "Unichar",
+}
+
+func (v TypeTag) String() string {
+	if v == 0 {
+		return stringsTypeTag[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsTypeTag[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsTypeTag[2])
+	}
+	if v&3 != 0 {
+		r = append(r, stringsTypeTag[3])
+	}
+	if v&4 != 0 {
+		r = append(r, stringsTypeTag[4])
+	}
+	if v&5 != 0 {
+		r = append(r, stringsTypeTag[5])
+	}
+	if v&6 != 0 {
+		r = append(r, stringsTypeTag[6])
+	}
+	if v&7 != 0 {
+		r = append(r, stringsTypeTag[7])
+	}
+	if v&8 != 0 {
+		r = append(r, stringsTypeTag[8])
+	}
+	if v&9 != 0 {
+		r = append(r, stringsTypeTag[9])
+	}
+	if v&10 != 0 {
+		r = append(r, stringsTypeTag[10])
+	}
+	if v&11 != 0 {
+		r = append(r, stringsTypeTag[11])
+	}
+	if v&12 != 0 {
+		r = append(r, stringsTypeTag[12])
+	}
+	if v&13 != 0 {
+		r = append(r, stringsTypeTag[13])
+	}
+	if v&14 != 0 {
+		r = append(r, stringsTypeTag[14])
+	}
+	if v&15 != 0 {
+		r = append(r, stringsTypeTag[15])
+	}
+	if v&16 != 0 {
+		r = append(r, stringsTypeTag[16])
+	}
+	if v&17 != 0 {
+		r = append(r, stringsTypeTag[17])
+	}
+	if v&18 != 0 {
+		r = append(r, stringsTypeTag[18])
+	}
+	if v&19 != 0 {
+		r = append(r, stringsTypeTag[19])
+	}
+	if v&20 != 0 {
+		r = append(r, stringsTypeTag[20])
+	}
+	if v&21 != 0 {
+		r = append(r, stringsTypeTag[21])
+	}
+	return strings.Join(r, ",")
+}
 
 type Typelib struct {
 	_ structs.HostLayout
@@ -496,6 +809,30 @@ const (
 	VFuncInfoFlagsOverride    VFuncInfoFlags = 2
 	VFuncInfoFlagsNotOverride VFuncInfoFlags = 4
 )
+
+var stringsVFuncInfoFlags = [...]string{
+	1: "ChainUp",
+	2: "Override",
+	4: "NotOverride",
+}
+
+func (v VFuncInfoFlags) String() string {
+	if v == 0 {
+		return stringsVFuncInfoFlags[v]
+	}
+
+	var r []string
+	if v&1 != 0 {
+		r = append(r, stringsVFuncInfoFlags[1])
+	}
+	if v&2 != 0 {
+		r = append(r, stringsVFuncInfoFlags[2])
+	}
+	if v&4 != 0 {
+		r = append(r, stringsVFuncInfoFlags[4])
+	}
+	return strings.Join(r, ",")
+}
 
 var TypeValueInfo = g.ToType[ValueInfo](uint64(C.gi_value_info_get_type()))
 

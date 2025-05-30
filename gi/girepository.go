@@ -286,3 +286,7 @@ func (info *EnumInfo) GetValues() iter.Seq2[uint, *ValueInfo] {
 func (info *ValueInfo) GetValue() int64 {
 	return int64(C.gi_value_info_get_value(info.c()))
 }
+
+func (info *TypeInfo) GetArrayType() ArrayType {
+	return ArrayType(C.gi_type_info_get_array_type(info.c()))
+}

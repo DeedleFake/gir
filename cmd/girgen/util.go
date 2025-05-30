@@ -16,7 +16,7 @@ var (
 		"float64",            // Double
 		"INVALID(GType)",     // GType
 		"string",             // Utf
-		"INVALID(Filename)",  // Filename
+		"string",             // Filename
 		"INVALID(Array)",     // Array
 		"INVALID(Interface)", // Interface
 		"INVALID(GList)",     // GList
@@ -41,7 +41,7 @@ var (
 		"C.float64",          // Double
 		"C.GType",            // Gtype
 		"*C.char",            // Utf
-		"INVALID(Filename)",  // Filename
+		"*C.char",            // Filename
 		"INVALID(Array)",     // Array
 		"INVALID(Interface)", // Interface
 		"INVALID(GList)",     // GList

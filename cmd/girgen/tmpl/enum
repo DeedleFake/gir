@@ -5,3 +5,29 @@ const (
 		{{$.Type.GetName}}{{$v.GetName | toCamelCase}} {{$.Type.GetName}} = {{$v.GetValue}};
 	{{- end}}
 )
+
+var strings{{.Type.GetName}} = [...]string{
+	{{range $_, $v := .Type.GetValues -}}
+		{{$v.GetValue}}: {{$v.GetName | toCamelCase | printf "%q"}},
+	{{end}}
+}
+
+func (v {{.Type.GetName}}) String() string {
+	{{- with toFlags .Type}}
+		if v == 0 {
+			return strings{{$.Type.GetName}}[v]
+		}
+
+		var r []string;
+		{{range $_, $v := $.Type.GetValues -}}
+			{{- with $v.GetValue -}}
+				if v & {{$v.GetValue}} != 0 {
+					r = append(r, strings{{$.Type.GetName}}[{{.}}])
+				};
+			{{- end -}}
+		{{- end}}
+		return strings.Join(r, ",")
+	{{- else -}}
+		return strings{{.Type.GetName}}[v]
+	{{end -}}
+}

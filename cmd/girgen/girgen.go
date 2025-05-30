@@ -60,6 +60,11 @@ var (
 			c, _ := gi.TypeEnumInfo.Check(info)
 			return c
 		},
+
+		"toFlags": func(info *gi.EnumInfo) *gi.FlagsInfo {
+			c, _ := gi.TypeFlagsInfo.Check(info)
+			return c
+		},
 	}
 )
 
