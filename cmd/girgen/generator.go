@@ -56,8 +56,13 @@ func (gen *Generator) PackageFor(namespace string) string {
 	return pkg
 }
 
-func (gen *Generator) MethodName(tname, mname string) string {
-	return util.MethodName(gen.CPrefix(), tname, mname)
+func (gen *Generator) MethodPrefix() string {
+	info := gi.TypeRegisteredTypeInfo.Cast(gen.Type)
+	return strings.TrimSuffix(info.GetTypeInitFunctionName(), "_get_type")
+}
+
+func (gen *Generator) MethodName(name string) string {
+	return fmt.Sprintf("%v_%v", gen.MethodPrefix(), name)
 }
 
 func (gen *Generator) CTypeName() string {

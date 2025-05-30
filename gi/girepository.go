@@ -181,6 +181,10 @@ func (info *RegisteredTypeInfo) GetGType() g.Type[g.TypeInstance] {
 	return g.ToType[g.TypeInstance](uint64(C.gi_registered_type_info_get_g_type(info.c())))
 }
 
+func (info *RegisteredTypeInfo) GetTypeInitFunctionName() string {
+	return C.GoString(C.gi_registered_type_info_get_type_init_function_name(info.c()))
+}
+
 var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
 
 func (info *ObjectInfo) GetNMethods() uint {

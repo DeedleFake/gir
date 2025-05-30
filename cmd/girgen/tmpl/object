@@ -1,4 +1,4 @@
-var Type{{.Type.GetName}} = {{with $.PackageFor "GLib"}}{{.}}.{{end}}ToType[{{.Type.GetName}}](C.{{$.MethodName .Type.GetName "get_type"}}())
+var Type{{.Type.GetName}} = {{with $.PackageFor "GLib"}}{{.}}.{{end}}ToType[{{.Type.GetName}}](uint64(C.{{.Type.GetTypeInitFunctionName}}()))
 
 type {{.Type.GetName}} struct {
 	_ structs.HostLayout
