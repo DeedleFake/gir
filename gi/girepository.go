@@ -178,6 +178,10 @@ func (info *CallableInfo) GetArgs() iter.Seq2[uint, *ArgInfo] {
 	}
 }
 
+func (info *CallableInfo) GetReturnType() *TypeInfo {
+	return (*TypeInfo)(unsafe.Pointer(C.gi_callable_info_get_return_type(info.c())))
+}
+
 var TypeFunctionInfo = g.ToType[FunctionInfo](uint64(C.gi_function_info_get_type()))
 
 type FunctionInfo struct {
@@ -343,6 +347,8 @@ func (info *FieldInfo) c() *C.GIFieldInfo {
 	return (*C.GIFieldInfo)(unsafe.Pointer(info))
 }
 
+var TypeArgInfo = g.ToType[ArgInfo](uint64(C.gi_arg_info_get_type()))
+
 type ArgInfo struct {
 	_ structs.HostLayout
 	BaseInfo
@@ -373,6 +379,10 @@ const (
 
 func (info *ArgInfo) GetDirection() Direction {
 	return Direction(C.gi_arg_info_get_direction(info.c()))
+}
+
+func (info *ArgInfo) IsSkip() bool {
+	return C.gi_arg_info_is_skip(info.c()) != 0
 }
 
 type TypeInfo struct {

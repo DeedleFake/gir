@@ -7,8 +7,8 @@
 		{{end}}
 	}
 
-	func (s *{{.Type.GetName}}) c() *C.{{.CName}} {
-		return (*C.{{.CName}})(unsafe.Pointer(s))
+	func (s *{{.Type.GetName}}) c() *C.{{.CTypeName}} {
+		return (*C.{{.CTypeName}})(unsafe.Pointer(s))
 	}
 
 	{{range $_, $method := .Type.GetMethods}}

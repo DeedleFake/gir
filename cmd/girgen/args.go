@@ -58,20 +58,12 @@ func (args *Arguments) COutput() string {
 	return arg.CName()
 }
 
+func (args *Arguments) ConvertToGo() string {
+	return util.JoinSeq(xiter.Map(args.goOutput(), (*Argument).ConvertToGo), "\n")
+}
+
 func (args *Arguments) ConvertToC() string {
-	var buf strings.Builder
-	for arg := range args.cInput() {
-		ti := arg.Info.GetTypeInfo()
-		switch tag := ti.GetTag(); tag {
-		case gi.TypeTagUtf:
-			fmt.Fprintf(&buf, "%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))\n", arg.CName(), arg.GoName(), arg.CName())
-
-		default:
-			fmt.Fprintf(&buf, "%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
-		}
-	}
-
-	return buf.String()
+	return util.JoinSeq(xiter.Map(args.cInput(), (*Argument).ConvertToC), "\n")
 }
 
 func (args *Arguments) goInput() iter.Seq[*Argument] {
@@ -79,7 +71,11 @@ func (args *Arguments) goInput() iter.Seq[*Argument] {
 }
 
 func (args *Arguments) goOutput() iter.Seq[*Argument] {
-	return xiter.Filter(slices.Values(args.Args), util.Not((*Argument).IsInput))
+	output := xiter.Filter(slices.Values(args.Args), util.Not((*Argument).IsInput))
+	if r := args.cOutput(); r != nil {
+		output = xiter.Concat(output, xiter.Of(r))
+	}
+	return output
 }
 
 func (args *Arguments) cInput() iter.Seq[*Argument] {
@@ -87,11 +83,12 @@ func (args *Arguments) cInput() iter.Seq[*Argument] {
 }
 
 func (args *Arguments) cOutput() *Argument {
-	f := slices.Collect(xiter.Filter(slices.Values(args.Args), func(arg *Argument) bool { return arg.Info.IsReturnValue() }))
-	if len(f) == 0 {
+	r := args.Callable().GetReturnType()
+	if r.GetTag() == gi.TypeTagVoid {
+		r.Unref()
 		return nil
 	}
-	return f[0]
+	return &Argument{Generator: args.Generator, Return: r}
 }
 
 type Argument struct {
@@ -99,6 +96,7 @@ type Argument struct {
 
 	Index  uint
 	Info   *gi.ArgInfo
+	Return *gi.TypeInfo
 	Hidden bool
 }
 
@@ -107,12 +105,19 @@ func (arg *Argument) Obscured() []int {
 	return nil
 }
 
+func (arg *Argument) TypeInfo() *gi.TypeInfo {
+	if arg.Return != nil {
+		return arg.Return
+	}
+	return arg.Info.GetTypeInfo()
+}
+
 func (arg *Argument) IsInput() bool {
-	return !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
+	return arg.Return == nil && !arg.Info.IsReturnValue() && arg.Info.GetDirection() != gi.DirectionOut
 }
 
 func (arg *Argument) IsCInput() bool {
-	return !arg.Info.IsReturnValue()
+	return arg.Return == nil
 }
 
 func (arg *Argument) GoInput() string {
@@ -120,11 +125,14 @@ func (arg *Argument) GoInput() string {
 }
 
 func (arg *Argument) GoName() string {
+	if arg.Return != nil {
+		return "r"
+	}
 	return arg.Info.GetName()
 }
 
 func (arg *Argument) GoType() string {
-	info := arg.Info.GetTypeInfo()
+	info := arg.TypeInfo()
 
 	var buf strings.Builder
 	switch tag := info.GetTag(); tag {
@@ -156,7 +164,7 @@ func (arg *Argument) CInput() string {
 }
 
 func (arg *Argument) CType() string {
-	info := arg.Info.GetTypeInfo()
+	info := arg.TypeInfo()
 
 	var buf strings.Builder
 	switch tag := info.GetTag(); tag {
@@ -185,7 +193,38 @@ func (arg *Argument) CType() string {
 }
 
 func (arg *Argument) CName() string {
+	if arg.Return != nil {
+		return "cr"
+	}
 	return fmt.Sprintf("arg%v", arg.Index)
+}
+
+func (arg *Argument) ConvertToGo() string {
+	ti := arg.TypeInfo()
+	switch tag := ti.GetTag(); tag {
+	case gi.TypeTagBoolean:
+		return fmt.Sprintf("%v = %v != 0", arg.GoName(), arg.CName())
+
+	case gi.TypeTagUtf:
+		return fmt.Sprintf("%v = C.GoString(%v)", arg.GoName(), arg.CName())
+
+	default:
+		return fmt.Sprintf("%v = (%v)(%v)", arg.GoName(), arg.GoType(), arg.CName())
+	}
+}
+
+func (arg *Argument) ConvertToC() string {
+	ti := arg.TypeInfo()
+	switch tag := ti.GetTag(); tag {
+	case gi.TypeTagBoolean:
+		return fmt.Sprintf("var %v C.gboolean\nif %v { %v = 1 }", arg.CName(), arg.GoName(), arg.CName())
+
+	case gi.TypeTagUtf:
+		return fmt.Sprintf("%v := C.CString(%v)\ndefer C.free(unsafe.Pointer(%v))", arg.CName(), arg.GoName(), arg.CName())
+
+	default:
+		return fmt.Sprintf("%v := (%v)(%v)", arg.CName(), arg.CType(), arg.GoName())
+	}
 }
 
 func (gen *Generator) RegisteredTypeToGo(info *gi.RegisteredTypeInfo) string {

@@ -5,11 +5,13 @@ import (
 	"io"
 	"strings"
 
+	"deedles.dev/gir/g"
 	"deedles.dev/gir/gi"
 	"deedles.dev/gir/internal/util"
 )
 
 type BaseInfoer interface {
+	g.TypeInstancer
 	GetName() string
 	AsGIBaseInfo() *gi.BaseInfo
 }
@@ -45,22 +47,13 @@ func (gen *Generator) CPrefix() string {
 	return util.ParseCPrefix(gen.Repo.GetCPrefix(gen.Config.Namespace))
 }
 
-func (gen *Generator) CName() (string, error) {
-	info := gen.Type.AsGIBaseInfo()
-
-	if info, ok := gi.TypeRegisteredTypeInfo.Check(info); ok {
-		return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName()), nil
-	}
-
-	if info, ok := gi.TypeCallableInfo.Check(info); ok {
-		return fmt.Sprintf("%v_%v", strings.ToLower(gen.CPrefix()), info.GetName()), nil
-	}
-
-	return "", fmt.Errorf("don't know how to get C name of type %q", info.TypeName())
-}
-
 func (gen *Generator) MethodName(tname, mname string) string {
 	return util.MethodName(gen.CPrefix(), tname, mname)
+}
+
+func (gen *Generator) CTypeName() string {
+	info := gi.TypeRegisteredTypeInfo.Cast(gen.Type)
+	return fmt.Sprintf("%v%v", gen.CPrefix(), info.GetName())
 }
 
 func (gen *Generator) Callable() *gi.CallableInfo {
