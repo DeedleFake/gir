@@ -189,7 +189,11 @@ func (arg *Argument) ConvertToGo() string {
 		// garbage collector. This is an exception to the manual memory
 		// management because handling it when it's hidden behind an error
 		// interface would be too gosh darn annoying otherwise.
-		return fmt.Sprintf("%v = (*g.Error)(unsafe.Pointer(%v))", arg.GoName(), arg.CName())
+		pkg, dot := arg.PackageFor("GLib"), ""
+		if pkg != "" {
+			dot = "."
+		}
+		return fmt.Sprintf("%v = (*%v%vError)(unsafe.Pointer(%v))", arg.GoName(), pkg, dot, arg.CName())
 	}
 
 	ti := arg.TypeInfo()
