@@ -15,38 +15,247 @@ import (
 	"deedles.dev/gir/g"
 )
 
+type ArgInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [48]byte
+}
+
+func (obj *ArgInfo) c() *C.GIArgInfo {
+	return (*C.GIArgInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *ArgInfo) AsGIArgInfo() *ArgInfo {
+	return obj
+}
+
 type AttributeIter struct {
 	_ structs.HostLayout
 	_ [40]byte
-
-	// data
-
-	// _dummy
-
 }
 
 func (s *AttributeIter) c() *C.GIAttributeIter {
 	return (*C.GIAttributeIter)(unsafe.Pointer(s))
 }
 
+type BaseInfo struct {
+	_ structs.HostLayout
+	g.TypeInstance
+	_ [88]byte
+}
+
+func (obj *BaseInfo) c() *C.GIBaseInfo {
+	return (*C.GIBaseInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *BaseInfo) AsGIBaseInfo() *BaseInfo {
+	return obj
+}
+
 type BaseInfoStack struct {
 	_ structs.HostLayout
 	_ [96]byte
-
-	// parent_instance
-
-	// dummy0
-
-	// dummy1
-
-	// dummy2
-
-	// dummy3
-
 }
 
 func (s *BaseInfoStack) c() *C.GIBaseInfoStack {
 	return (*C.GIBaseInfoStack)(unsafe.Pointer(s))
+}
+
+type CallableInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *CallableInfo) c() *C.GICallableInfo {
+	return (*C.GICallableInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *CallableInfo) AsGICallableInfo() *CallableInfo {
+	return obj
+}
+
+type CallbackInfo struct {
+	_ structs.HostLayout
+	CallableInfo
+}
+
+func (obj *CallbackInfo) c() *C.GICallbackInfo {
+	return (*C.GICallbackInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *CallbackInfo) AsGICallbackInfo() *CallbackInfo {
+	return obj
+}
+
+type ConstantInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *ConstantInfo) c() *C.GIConstantInfo {
+	return (*C.GIConstantInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *ConstantInfo) AsGIConstantInfo() *ConstantInfo {
+	return obj
+}
+
+type EnumInfo struct {
+	_ structs.HostLayout
+	RegisteredTypeInfo
+}
+
+func (obj *EnumInfo) c() *C.GIEnumInfo {
+	return (*C.GIEnumInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *EnumInfo) AsGIEnumInfo() *EnumInfo {
+	return obj
+}
+
+type FieldInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *FieldInfo) c() *C.GIFieldInfo {
+	return (*C.GIFieldInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *FieldInfo) AsGIFieldInfo() *FieldInfo {
+	return obj
+}
+
+type FlagsInfo struct {
+	_ structs.HostLayout
+	EnumInfo
+}
+
+func (obj *FlagsInfo) c() *C.GIFlagsInfo {
+	return (*C.GIFlagsInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *FlagsInfo) AsGIFlagsInfo() *FlagsInfo {
+	return obj
+}
+
+type FunctionInfo struct {
+	_ structs.HostLayout
+	CallableInfo
+}
+
+func (obj *FunctionInfo) c() *C.GIFunctionInfo {
+	return (*C.GIFunctionInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *FunctionInfo) AsGIFunctionInfo() *FunctionInfo {
+	return obj
+}
+
+type InterfaceInfo struct {
+	_ structs.HostLayout
+	RegisteredTypeInfo
+}
+
+func (obj *InterfaceInfo) c() *C.GIInterfaceInfo {
+	return (*C.GIInterfaceInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *InterfaceInfo) AsGIInterfaceInfo() *InterfaceInfo {
+	return obj
+}
+
+type ObjectInfo struct {
+	_ structs.HostLayout
+	RegisteredTypeInfo
+}
+
+func (obj *ObjectInfo) c() *C.GIObjectInfo {
+	return (*C.GIObjectInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *ObjectInfo) AsGIObjectInfo() *ObjectInfo {
+	return obj
+}
+
+type PropertyInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *PropertyInfo) c() *C.GIPropertyInfo {
+	return (*C.GIPropertyInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *PropertyInfo) AsGIPropertyInfo() *PropertyInfo {
+	return obj
+}
+
+type RegisteredTypeInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *RegisteredTypeInfo) c() *C.GIRegisteredTypeInfo {
+	return (*C.GIRegisteredTypeInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *RegisteredTypeInfo) AsGIRegisteredTypeInfo() *RegisteredTypeInfo {
+	return obj
+}
+
+type Repository struct {
+	_ structs.HostLayout
+	g.Object
+	_ [96]byte
+}
+
+func (obj *Repository) c() *C.GIRepository {
+	return (*C.GIRepository)(unsafe.Pointer(obj))
+}
+
+func (obj *Repository) AsGIRepository() *Repository {
+	return obj
+}
+
+type SignalInfo struct {
+	_ structs.HostLayout
+	CallableInfo
+}
+
+func (obj *SignalInfo) c() *C.GISignalInfo {
+	return (*C.GISignalInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *SignalInfo) AsGISignalInfo() *SignalInfo {
+	return obj
+}
+
+type StructInfo struct {
+	_ structs.HostLayout
+	RegisteredTypeInfo
+}
+
+func (obj *StructInfo) c() *C.GIStructInfo {
+	return (*C.GIStructInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *StructInfo) AsGIStructInfo() *StructInfo {
+	return obj
+}
+
+type TypeInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [48]byte
+}
+
+func (obj *TypeInfo) c() *C.GITypeInfo {
+	return (*C.GITypeInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *TypeInfo) AsGITypeInfo() *TypeInfo {
+	return obj
 }
 
 type Typelib struct {
@@ -96,4 +305,57 @@ func (s *Typelib) Unref() {
 	C.gi_typelib_unref(s.c())
 
 	return
+}
+
+type UnionInfo struct {
+	_ structs.HostLayout
+	RegisteredTypeInfo
+}
+
+func (obj *UnionInfo) c() *C.GIUnionInfo {
+	return (*C.GIUnionInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *UnionInfo) AsGIUnionInfo() *UnionInfo {
+	return obj
+}
+
+type UnresolvedInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+	_ [16]byte
+}
+
+func (obj *UnresolvedInfo) c() *C.GIUnresolvedInfo {
+	return (*C.GIUnresolvedInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *UnresolvedInfo) AsGIUnresolvedInfo() *UnresolvedInfo {
+	return obj
+}
+
+type VFuncInfo struct {
+	_ structs.HostLayout
+	CallableInfo
+}
+
+func (obj *VFuncInfo) c() *C.GIVFuncInfo {
+	return (*C.GIVFuncInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *VFuncInfo) AsGIVFuncInfo() *VFuncInfo {
+	return obj
+}
+
+type ValueInfo struct {
+	_ structs.HostLayout
+	BaseInfo
+}
+
+func (obj *ValueInfo) c() *C.GIValueInfo {
+	return (*C.GIValueInfo)(unsafe.Pointer(obj))
+}
+
+func (obj *ValueInfo) AsGIValueInfo() *ValueInfo {
+	return obj
 }
