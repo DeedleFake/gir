@@ -4,14 +4,14 @@ var (
 	typeTagsGo = [...]string{
 		"INVALID(Void)",      // Void
 		"bool",               // Boolean
-		"int8",               // Int
-		"uint8",              // Uint
-		"int16",              // Int
-		"uint16",             // Uint
-		"int32",              // Int
-		"uint32",             // Uint
-		"int64",              // Int
-		"uint64",             // Uint
+		"int8",               // Int8
+		"uint8",              // Uint8
+		"int16",              // Int16
+		"uint16",             // Uint16
+		"int32",              // Int32
+		"uint32",             // Uint32
+		"int64",              // Int64
+		"uint64",             // Uint64
 		"float32",            // Float
 		"float64",            // Double
 		"INVALID(GType)",     // GType
@@ -29,16 +29,16 @@ var (
 	typeTagsC = [...]string{
 		"INVALID(Void)",      // Void
 		"C.gboolean",         // Boolean
-		"C.int8",             // Int
-		"C.uint8",            // Uint
-		"C.int16",            // Int
-		"C.uint16",           // Uint
-		"C.int32",            // Int
-		"C.uint32",           // Uint
-		"C.int64",            // Int
-		"C.uint64",           // Uint
-		"C.float32",          // Float
-		"C.float64",          // Double
+		"C.schar",            // Int8
+		"C.uchar",            // Uint8
+		"C.short",            // Int16
+		"C.ushort",           // Uint16
+		"C.int",              // Int32
+		"C.uint",             // Uint32
+		"C.longlong",         // Int64
+		"C.ulonglong",        // Uint64
+		"C.float",            // Float
+		"C.double",           // Double
 		"C.GType",            // Gtype
 		"*C.char",            // Utf
 		"*C.char",            // Filename
