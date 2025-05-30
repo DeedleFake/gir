@@ -290,3 +290,11 @@ func (info *ValueInfo) GetValue() int64 {
 func (info *TypeInfo) GetArrayType() ArrayType {
 	return ArrayType(C.gi_type_info_get_array_type(info.c()))
 }
+
+func (info *BaseInfo) GetContainer() *BaseInfo {
+	return (*BaseInfo)(unsafe.Pointer(C.gi_base_info_get_container(info.c())))
+}
+
+func (info *ObjectInfo) GetRefFunctionName() string {
+	return C.GoString(C.gi_object_info_get_ref_function_name(info.c()))
+}

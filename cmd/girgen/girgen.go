@@ -32,6 +32,10 @@ var (
 			return typeInstanceParentInfo{}
 		},
 
+		"isGPointerReceiver": func(name string) bool {
+			return name == "clear" || name == "ref" || name == "unref"
+		},
+
 		"isClass": func(name string) bool {
 			return strings.HasSuffix(name, "Class")
 		},

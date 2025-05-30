@@ -2,5 +2,3 @@ namespace GIRepository
 version 3.0
 pkg-config girepository-2.0
 include <girepository/girepository.h>
-
-skip gi_base_info_clear
