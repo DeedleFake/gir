@@ -1,4 +1,4 @@
-var Type{{.Type.GetName}} = {{with $.PackageFor "GLib"}}{{.}}.{{end}}ToType[{{.Type.GetName}}](uint64(C.{{.Type.GetTypeInitFunctionName}}()))
+var Type{{.Type.GetName}} = {{with $.PackageFor "GLib"}}{{.}}.{{end}}Type[{{.Type.GetName}}](C.{{.Type.GetTypeInitFunctionName}}())
 
 type {{.Type.GetName}} struct {
 	_ structs.HostLayout
@@ -14,6 +14,6 @@ func (obj *{{.Type.GetName}}) As{{.CTypeName .Type}}() *{{.Type.GetName}} {
 	return obj
 }
 
-{{range $_, $method := .Type.GetMethods}}
+{{/*{{range $_, $method := .Type.GetMethods}}
 	{{$.Generate "func" $.Type $method}}
-{{end}}
+{{end}}*/}}

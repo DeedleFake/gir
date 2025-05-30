@@ -119,10 +119,9 @@ func (gen *Generator) TypeInfoToGo(info *gi.TypeInfo) string {
 	case gi.TypeTagGtype:
 		pkg := gen.PackageFor("GObject")
 		if pkg != "" {
-			buf.WriteString(pkg)
-			buf.WriteByte('.')
+			pkg += "."
 		}
-		buf.WriteString("Type")
+		fmt.Fprintf(&buf, "%vType[%vTypeInstance]", pkg, pkg)
 
 	case gi.TypeTagArray:
 		fmt.Fprintf(&buf, "[]%v", gen.TypeInfoToGo(info.GetParamType(0)))

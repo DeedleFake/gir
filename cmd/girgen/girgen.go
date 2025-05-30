@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	"deedles.dev/gir/g"
 	"deedles.dev/gir/gi"
 	"deedles.dev/gir/internal/util"
 	"golang.org/x/tools/imports"
@@ -40,32 +41,32 @@ var (
 			return strings.HasSuffix(name, "Class")
 		},
 
-		"toCallable": func(info *gi.BaseInfo) *gi.CallableInfo {
+		"toCallable": func(info g.TypeInstancer) *gi.CallableInfo {
 			c, _ := gi.TypeCallableInfo.Check(info)
 			return c
 		},
 
-		"toStruct": func(info *gi.BaseInfo) *gi.StructInfo {
+		"toStruct": func(info g.TypeInstancer) *gi.StructInfo {
 			c, _ := gi.TypeStructInfo.Check(info)
 			return c
 		},
 
-		"toObject": func(info *gi.BaseInfo) *gi.ObjectInfo {
+		"toObject": func(info g.TypeInstancer) *gi.ObjectInfo {
 			c, _ := gi.TypeObjectInfo.Check(info)
 			return c
 		},
 
-		"toConstant": func(info *gi.BaseInfo) *gi.ConstantInfo {
+		"toConstant": func(info g.TypeInstancer) *gi.ConstantInfo {
 			c, _ := gi.TypeConstantInfo.Check(info)
 			return c
 		},
 
-		"toEnum": func(info *gi.BaseInfo) *gi.EnumInfo {
+		"toEnum": func(info g.TypeInstancer) *gi.EnumInfo {
 			c, _ := gi.TypeEnumInfo.Check(info)
 			return c
 		},
 
-		"toFlags": func(info *gi.EnumInfo) *gi.FlagsInfo {
+		"toFlags": func(info g.TypeInstancer) *gi.FlagsInfo {
 			c, _ := gi.TypeFlagsInfo.Check(info)
 			return c
 		},

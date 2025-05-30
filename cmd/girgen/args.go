@@ -213,6 +213,11 @@ func (arg *Argument) ConvertToGo() string {
 		return fmt.Sprintf("%v = C.GoString(%v)", arg.GoName(), arg.CName())
 
 	case gi.TypeTagInterface:
+		i := info.GetInterface()
+		if _, ok := gi.TypeEnumInfo.Check(i); ok {
+			return fmt.Sprintf("%v = %v(%v)", arg.GoName(), arg.GoType(), arg.CName())
+		}
+
 		deref := "*"
 		addr := "&"
 		if info.IsPointer() {
@@ -247,6 +252,10 @@ func (arg *Argument) ConvertToC() string {
 		return fmt.Sprintf("%v := C.CString(%v)%v", arg.CName(), arg.GoName(), free)
 
 	case gi.TypeTagInterface:
+		i := info.GetInterface()
+		if _, ok := gi.TypeEnumInfo.Check(i); ok {
+			return fmt.Sprintf("%v := %v(%v)", arg.CName(), arg.CType(), arg.GoName())
+		}
 		return fmt.Sprintf("%v := (%v)(unsafe.Pointer(%v))", arg.CName(), arg.CType(), arg.GoName())
 
 	default:

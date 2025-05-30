@@ -147,7 +147,7 @@ func (info *RegisteredTypeInfo) GetTypeName() string {
 }
 
 func (info *RegisteredTypeInfo) GetGType() g.Type[g.TypeInstance] {
-	return g.ToType[g.TypeInstance](uint64(C.gi_registered_type_info_get_g_type(info.c())))
+	return g.Type[g.TypeInstance](C.gi_registered_type_info_get_g_type(info.c()))
 }
 
 func (info *RegisteredTypeInfo) GetTypeInitFunctionName() string {

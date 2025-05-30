@@ -16,7 +16,7 @@ import (
 	"deedles.dev/gir/g"
 )
 
-var TypeArgInfo = g.ToType[ArgInfo](uint64(C.gi_arg_info_get_type()))
+var TypeArgInfo = g.Type[ArgInfo](C.gi_arg_info_get_type())
 
 type ArgInfo struct {
 	_ structs.HostLayout
@@ -75,7 +75,7 @@ func (s *AttributeIter) c() *C.GIAttributeIter {
 	return (*C.GIAttributeIter)(unsafe.Pointer(s))
 }
 
-var TypeBaseInfo = g.ToType[BaseInfo](uint64(C.gi_base_info_get_type()))
+var TypeBaseInfo = g.Type[BaseInfo](C.gi_base_info_get_type())
 
 type BaseInfo struct {
 	_ structs.HostLayout
@@ -100,7 +100,7 @@ func (s *BaseInfoStack) c() *C.GIBaseInfoStack {
 	return (*C.GIBaseInfoStack)(unsafe.Pointer(s))
 }
 
-var TypeCallableInfo = g.ToType[CallableInfo](uint64(C.gi_callable_info_get_type()))
+var TypeCallableInfo = g.Type[CallableInfo](C.gi_callable_info_get_type())
 
 type CallableInfo struct {
 	_ structs.HostLayout
@@ -115,7 +115,7 @@ func (obj *CallableInfo) AsGICallableInfo() *CallableInfo {
 	return obj
 }
 
-var TypeCallbackInfo = g.ToType[CallbackInfo](uint64(C.gi_callback_info_get_type()))
+var TypeCallbackInfo = g.Type[CallbackInfo](C.gi_callback_info_get_type())
 
 type CallbackInfo struct {
 	_ structs.HostLayout
@@ -130,7 +130,7 @@ func (obj *CallbackInfo) AsGICallbackInfo() *CallbackInfo {
 	return obj
 }
 
-var TypeConstantInfo = g.ToType[ConstantInfo](uint64(C.gi_constant_info_get_type()))
+var TypeConstantInfo = g.Type[ConstantInfo](C.gi_constant_info_get_type())
 
 type ConstantInfo struct {
 	_ structs.HostLayout
@@ -174,7 +174,7 @@ func (v Direction) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeEnumInfo = g.ToType[EnumInfo](uint64(C.gi_enum_info_get_type()))
+var TypeEnumInfo = g.Type[EnumInfo](C.gi_enum_info_get_type())
 
 type EnumInfo struct {
 	_ structs.HostLayout
@@ -189,7 +189,7 @@ func (obj *EnumInfo) AsGIEnumInfo() *EnumInfo {
 	return obj
 }
 
-var TypeFieldInfo = g.ToType[FieldInfo](uint64(C.gi_field_info_get_type()))
+var TypeFieldInfo = g.Type[FieldInfo](C.gi_field_info_get_type())
 
 type FieldInfo struct {
 	_ structs.HostLayout
@@ -231,7 +231,7 @@ func (v FieldInfoFlags) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeFlagsInfo = g.ToType[FlagsInfo](uint64(C.gi_flags_info_get_type()))
+var TypeFlagsInfo = g.Type[FlagsInfo](C.gi_flags_info_get_type())
 
 type FlagsInfo struct {
 	_ structs.HostLayout
@@ -246,7 +246,7 @@ func (obj *FlagsInfo) AsGIFlagsInfo() *FlagsInfo {
 	return obj
 }
 
-var TypeFunctionInfo = g.ToType[FunctionInfo](uint64(C.gi_function_info_get_type()))
+var TypeFunctionInfo = g.Type[FunctionInfo](C.gi_function_info_get_type())
 
 type FunctionInfo struct {
 	_ structs.HostLayout
@@ -308,7 +308,7 @@ func (v FunctionInfoFlags) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeInterfaceInfo = g.ToType[InterfaceInfo](uint64(C.gi_interface_info_get_type()))
+var TypeInterfaceInfo = g.Type[InterfaceInfo](C.gi_interface_info_get_type())
 
 type InterfaceInfo struct {
 	_ structs.HostLayout
@@ -352,7 +352,7 @@ func (v InvokeError) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeObjectInfo = g.ToType[ObjectInfo](uint64(C.gi_object_info_get_type()))
+var TypeObjectInfo = g.Type[ObjectInfo](C.gi_object_info_get_type())
 
 type ObjectInfo struct {
 	_ structs.HostLayout
@@ -367,7 +367,7 @@ func (obj *ObjectInfo) AsGIObjectInfo() *ObjectInfo {
 	return obj
 }
 
-var TypePropertyInfo = g.ToType[PropertyInfo](uint64(C.gi_property_info_get_type()))
+var TypePropertyInfo = g.Type[PropertyInfo](C.gi_property_info_get_type())
 
 type PropertyInfo struct {
 	_ structs.HostLayout
@@ -382,7 +382,7 @@ func (obj *PropertyInfo) AsGIPropertyInfo() *PropertyInfo {
 	return obj
 }
 
-var TypeRegisteredTypeInfo = g.ToType[RegisteredTypeInfo](uint64(C.gi_registered_type_info_get_type()))
+var TypeRegisteredTypeInfo = g.Type[RegisteredTypeInfo](C.gi_registered_type_info_get_type())
 
 type RegisteredTypeInfo struct {
 	_ structs.HostLayout
@@ -397,7 +397,7 @@ func (obj *RegisteredTypeInfo) AsGIRegisteredTypeInfo() *RegisteredTypeInfo {
 	return obj
 }
 
-var TypeRepository = g.ToType[Repository](uint64(C.gi_repository_get_type()))
+var TypeRepository = g.Type[Repository](C.gi_repository_get_type())
 
 type Repository struct {
 	_ structs.HostLayout
@@ -510,7 +510,7 @@ func (v ScopeType) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeSignalInfo = g.ToType[SignalInfo](uint64(C.gi_signal_info_get_type()))
+var TypeSignalInfo = g.Type[SignalInfo](C.gi_signal_info_get_type())
 
 type SignalInfo struct {
 	_ structs.HostLayout
@@ -525,7 +525,7 @@ func (obj *SignalInfo) AsGISignalInfo() *SignalInfo {
 	return obj
 }
 
-var TypeStructInfo = g.ToType[StructInfo](uint64(C.gi_struct_info_get_type()))
+var TypeStructInfo = g.Type[StructInfo](C.gi_struct_info_get_type())
 
 type StructInfo struct {
 	_ structs.HostLayout
@@ -571,7 +571,7 @@ func (v Transfer) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeTypeInfo = g.ToType[TypeInfo](uint64(C.gi_type_info_get_type()))
+var TypeTypeInfo = g.Type[TypeInfo](C.gi_type_info_get_type())
 
 type TypeInfo struct {
 	_ structs.HostLayout
@@ -744,7 +744,7 @@ func (s *Typelib) Ref() (r *Typelib) {
 func (s *Typelib) Symbol(symbol_name string) (symbol unsafe.Pointer, r bool) {
 	arg0 := C.CString(symbol_name)
 	defer C.free(unsafe.Pointer(arg0))
-	arg1 := (unsafe.Pointer)(symbol)
+	var arg1 unsafe.Pointer
 	cr := C.gi_typelib_symbol(s.c(), arg0, &arg1)
 	symbol = (unsafe.Pointer)(arg1)
 	r = cr != 0
@@ -756,7 +756,7 @@ func (s *Typelib) Unref() {
 	return
 }
 
-var TypeUnionInfo = g.ToType[UnionInfo](uint64(C.gi_union_info_get_type()))
+var TypeUnionInfo = g.Type[UnionInfo](C.gi_union_info_get_type())
 
 type UnionInfo struct {
 	_ structs.HostLayout
@@ -771,7 +771,7 @@ func (obj *UnionInfo) AsGIUnionInfo() *UnionInfo {
 	return obj
 }
 
-var TypeUnresolvedInfo = g.ToType[UnresolvedInfo](uint64(C.gi_unresolved_info_get_type()))
+var TypeUnresolvedInfo = g.Type[UnresolvedInfo](C.gi_unresolved_info_get_type())
 
 type UnresolvedInfo struct {
 	_ structs.HostLayout
@@ -787,7 +787,7 @@ func (obj *UnresolvedInfo) AsGIUnresolvedInfo() *UnresolvedInfo {
 	return obj
 }
 
-var TypeVFuncInfo = g.ToType[VFuncInfo](uint64(C.gi_vfunc_info_get_type()))
+var TypeVFuncInfo = g.Type[VFuncInfo](C.gi_vfunc_info_get_type())
 
 type VFuncInfo struct {
 	_ structs.HostLayout
@@ -834,7 +834,7 @@ func (v VFuncInfoFlags) String() string {
 	return strings.Join(r, ",")
 }
 
-var TypeValueInfo = g.ToType[ValueInfo](uint64(C.gi_value_info_get_type()))
+var TypeValueInfo = g.Type[ValueInfo](C.gi_value_info_get_type())
 
 type ValueInfo struct {
 	_ structs.HostLayout

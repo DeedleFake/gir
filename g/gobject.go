@@ -17,17 +17,10 @@ import (
 	"deedles.dev/gir/internal/util"
 )
 
-type Type[T any] struct {
-	_ structs.HostLayout
-	_ [unsafe.Sizeof(*new(C.GType))]byte
-}
+type Type[T any] uint64
 
-func ToType[T any](c uint64) Type[T] {
-	return *(*Type[T])(unsafe.Pointer(&c))
-}
-
-func (t *Type[T]) c() C.GType {
-	return *(*C.GType)(unsafe.Pointer(t))
+func (t Type[T]) c() C.GType {
+	return C.GType(t)
 }
 
 func (t Type[T]) New(props ...any) *T {
@@ -67,6 +60,10 @@ func (t Type[T]) Query() *TypeQuery {
 	var q TypeQuery
 	C.g_type_query(t.c(), q.c())
 	return &q
+}
+
+func (t Type[T]) WithoutType() Type[TypeInstance] {
+	return Type[TypeInstance](t)
 }
 
 type TypeQuery struct {
@@ -167,3 +164,5 @@ func (obj *Object) Ref() {
 func (obj *Object) Unref() {
 	C.g_object_unref(C.gpointer(obj.c()))
 }
+
+type ParamFlags int64

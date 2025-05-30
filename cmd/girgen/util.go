@@ -36,7 +36,7 @@ var (
 		"C.int",              // Int32
 		"C.uint",             // Uint32
 		"C.longlong",         // Int64
-		"C.ulonglong",        // Uint64
+		"C.size_t",           // Uint64
 		"C.float",            // Float
 		"C.double",           // Double
 		"C.GType",            // Gtype
