@@ -57,6 +57,10 @@ func (gen *Generator) PackageFor(namespace string) string {
 	return pkg
 }
 
+func (gen *Generator) CTypeName(info BaseInfoer) string {
+	return fmt.Sprintf("%v%v", util.ParseCPrefix(gen.Repo.GetCPrefix(info.GetNamespace())), info.GetName())
+}
+
 func (gen *Generator) MethodPrefix() string {
 	info := gi.TypeRegisteredTypeInfo.Cast(gen.Type)
 	return strings.TrimSuffix(info.GetTypeInitFunctionName(), "_get_type")
@@ -147,7 +151,7 @@ func (gen *Generator) TypeInfoToC(info *gi.TypeInfo) string {
 		i := info.GetInterface()
 		if i, ok := gi.TypeRegisteredTypeInfo.Check(i); ok {
 			buf.WriteString("C.")
-			buf.WriteString(CTypeName(i))
+			buf.WriteString(gen.CTypeName(i))
 		}
 
 	case gi.TypeTagArray:

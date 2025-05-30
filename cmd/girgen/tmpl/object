@@ -6,11 +6,11 @@ type {{.Type.GetName}} struct {
 	{{with .InstanceSize}}_ [{{.}}]byte{{end}}
 }
 
-func (obj *{{.Type.GetName}}) c() *C.{{.Type | cTypeName}} {
-	return (*C.{{.Type | cTypeName}})(unsafe.Pointer(obj))
+func (obj *{{.Type.GetName}}) c() *C.{{.CTypeName .Type}} {
+	return (*C.{{.CTypeName .Type}})(unsafe.Pointer(obj))
 }
 
-func (obj *{{.Type.GetName}}) As{{.Type | cTypeName}}() *{{.Type.GetName}} {
+func (obj *{{.Type.GetName}}) As{{.CTypeName .Type}}() *{{.Type.GetName}} {
 	return obj
 }
 
