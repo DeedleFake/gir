@@ -58,32 +58,42 @@ func (s *Typelib) c() *C.GITypelib {
 	return (*C.GITypelib)(unsafe.Pointer(s))
 }
 
-func TypelibNewFromBytes(bytes *g.Bytes) {
-	panic("Not implemented.")
+func TypelibNewFromBytes(bytes *g.Bytes) (r *Typelib, err error) {
+	arg0 := (*C.GBytes)(unsafe.Pointer(bytes))
+	var gerr *C.GError
+	cr := C.gi_typelib_new_from_bytes(arg0, &gerr)
+	r = (*Typelib)(unsafe.Pointer(cr))
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
 }
 
-func (s *Typelib) GetNamespace() {
+func (s *Typelib) GetNamespace() (r string) {
 
-	C.gi_typelib_get_namespace(s.c())
-
+	cr := C.gi_typelib_get_namespace(s.c())
+	r = C.GoString(cr)
+	return
 }
 
-func (s *Typelib) Ref() {
+func (s *Typelib) Ref() (r *Typelib) {
 
-	C.gi_typelib_ref(s.c())
-
+	cr := C.gi_typelib_ref(s.c())
+	r = (*Typelib)(unsafe.Pointer(cr))
+	return
 }
 
-func (s *Typelib) Symbol(symbol_name string) (symbol unsafe.Pointer) {
+func (s *Typelib) Symbol(symbol_name string) (symbol unsafe.Pointer, r bool) {
 	arg0 := C.CString(symbol_name)
 	defer C.free(unsafe.Pointer(arg0))
 	arg1 := (unsafe.Pointer)(symbol)
-	C.gi_typelib_symbol(s.c(), arg0, &arg1)
-	panic("Not implemented.")
+	cr := C.gi_typelib_symbol(s.c(), arg0, &arg1)
+	symbol = (unsafe.Pointer)(arg1)
+	r = cr != 0
+	return
 }
 
 func (s *Typelib) Unref() {
 
 	C.gi_typelib_unref(s.c())
 
+	return
 }
