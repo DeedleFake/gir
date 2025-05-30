@@ -351,3 +351,27 @@ func (info *TypeInfo) GetInterface() *BaseInfo {
 func (info *TypeInfo) IsPointer() bool {
 	return C.gi_type_info_is_pointer(info.c()) != 0
 }
+
+func (info *EnumInfo) GetNValues() uint {
+	return uint(C.gi_enum_info_get_n_values(info.c()))
+}
+
+func (info *EnumInfo) GetValue(index uint) *ValueInfo {
+	return (*ValueInfo)(unsafe.Pointer(C.gi_enum_info_get_value(info.c(), C.uint(index))))
+}
+
+func (info *EnumInfo) GetValues() iter.Seq2[uint, *ValueInfo] {
+	return func(yield func(uint, *ValueInfo) bool) {
+		n := info.GetNValues()
+		for i := range n {
+			v := info.GetValue(i)
+			if !yield(i, v) {
+				return
+			}
+		}
+	}
+}
+
+func (info *ValueInfo) GetValue() int64 {
+	return int64(C.gi_value_info_get_value(info.c()))
+}

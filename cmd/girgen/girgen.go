@@ -55,6 +55,11 @@ var (
 			c, _ := gi.TypeConstantInfo.Check(info)
 			return c
 		},
+
+		"toEnum": func(info *gi.BaseInfo) *gi.EnumInfo {
+			c, _ := gi.TypeEnumInfo.Check(info)
+			return c
+		},
 	}
 )
 

@@ -2,16 +2,16 @@
 
 {{if .Element.IsMethod}}
 	func (s *{{.Type.GetName}}) {{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
-		{{$args.ConvertToC}}
-		{{with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}(s.c(), {{$args.CInput}})
-		{{$args.ConvertToGo}}
+		{{- $args.ConvertToC -}};
+		{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}(s.c(), {{$args.CInput}});
+		{{- $args.ConvertToGo -}};
 		return
 	}
 {{else}}
 	func {{.Type.GetName}}{{toCamelCase .Element.GetName}}({{$args.GoInput}}) ({{$args.GoOutput}}) {
-		{{$args.ConvertToC}}
-		{{with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}({{$args.CInput}})
-		{{$args.ConvertToGo}}
+		{{- $args.ConvertToC -}};
+		{{- with $args.COutput}}{{.}} := {{end}}C.{{.MethodName .Element.GetName}}({{$args.CInput}});
+		{{- $args.ConvertToGo -}};
 		return
 	}
 {{end}}

@@ -24,4 +24,8 @@ import()
 	{{with toConstant $info}}
 		{{$.Generate "constant" . nil}}
 	{{end}}
+
+	{{with toEnum $info}}
+		{{$.Generate "enum" . nil}}
+	{{end}}
 {{end}}

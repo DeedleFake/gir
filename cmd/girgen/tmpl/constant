@@ -1,0 +1,1 @@
+const {{.Type.GetName | toCamelCase}} = "NOT IMPLEMENTED"

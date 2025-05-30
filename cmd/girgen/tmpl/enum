@@ -1,0 +1,7 @@
+type {{.Type.GetName}} int64
+
+const (
+	{{range $_, $v := .Type.GetValues -}}
+		{{$.Type.GetName}}{{$v.GetName | toCamelCase}} {{$.Type.GetName}} = {{$v.GetValue}};
+	{{- end}}
+)
