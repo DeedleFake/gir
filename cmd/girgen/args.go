@@ -108,7 +108,7 @@ func (args *Arguments) err() *Argument {
 type Argument struct {
 	*Arguments
 
-	Index  uint
+	Index  uint32
 	Info   *gi.ArgInfo
 	Return *gi.TypeInfo
 	Hidden bool

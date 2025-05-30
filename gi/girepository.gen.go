@@ -32,6 +32,83 @@ func (obj *ArgInfo) AsGIArgInfo() *ArgInfo {
 	return obj
 }
 
+func (s *ArgInfo) GetClosureIndex() (out_closure_index uint32, r bool) {
+	var arg0 C.uint
+	cr := C.gi_arg_info_get_closure_index(s.c(), &arg0)
+	out_closure_index = (uint32)(arg0)
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) GetDestroyIndex() (out_destroy_index uint32, r bool) {
+	var arg0 C.uint
+	cr := C.gi_arg_info_get_destroy_index(s.c(), &arg0)
+	out_destroy_index = (uint32)(arg0)
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) GetDirection() (r Direction) {
+	cr := C.gi_arg_info_get_direction(s.c())
+	r = Direction(cr)
+	return
+}
+
+func (s *ArgInfo) GetOwnershipTransfer() (r Transfer) {
+	cr := C.gi_arg_info_get_ownership_transfer(s.c())
+	r = Transfer(cr)
+	return
+}
+
+func (s *ArgInfo) GetScope() (r ScopeType) {
+	cr := C.gi_arg_info_get_scope(s.c())
+	r = ScopeType(cr)
+	return
+}
+
+func (s *ArgInfo) GetTypeInfo() (r *TypeInfo) {
+	cr := C.gi_arg_info_get_type_info(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ArgInfo) IsCallerAllocates() (r bool) {
+	cr := C.gi_arg_info_is_caller_allocates(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) IsOptional() (r bool) {
+	cr := C.gi_arg_info_is_optional(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) IsReturnValue() (r bool) {
+	cr := C.gi_arg_info_is_return_value(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) IsSkip() (r bool) {
+	cr := C.gi_arg_info_is_skip(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ArgInfo) LoadTypeInfo() (_type TypeInfo) {
+	var arg0 C.GITypeInfo
+	C.gi_arg_info_load_type_info(s.c(), &arg0)
+	_type = *(*TypeInfo)(unsafe.Pointer(&arg0))
+	return
+}
+
+func (s *ArgInfo) MayBeNull() (r bool) {
+	cr := C.gi_arg_info_may_be_null(s.c())
+	r = cr != 0
+	return
+}
+
 type ArrayType int64
 
 const (
@@ -91,6 +168,78 @@ func (obj *BaseInfo) AsGIBaseInfo() *BaseInfo {
 	return obj
 }
 
+func (s *BaseInfo) Clear() {
+	C.gi_base_info_clear(unsafe.Pointer(s.c()))
+	return
+}
+
+func (s *BaseInfo) Equal(info2 *BaseInfo) (r bool) {
+	arg0 := (*C.GIBaseInfo)(unsafe.Pointer(info2))
+	cr := C.gi_base_info_equal(s.c(), arg0)
+	r = cr != 0
+	return
+}
+
+func (s *BaseInfo) GetAttribute(name string) (r string) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_base_info_get_attribute(s.c(), arg0)
+	r = C.GoString(cr)
+	return
+}
+
+func (s *BaseInfo) GetContainer() (r *BaseInfo) {
+	cr := C.gi_base_info_get_container(s.c())
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *BaseInfo) GetName() (r string) {
+	cr := C.gi_base_info_get_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *BaseInfo) GetNamespace() (r string) {
+	cr := C.gi_base_info_get_namespace(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *BaseInfo) GetTypelib() (r *Typelib) {
+	cr := C.gi_base_info_get_typelib(s.c())
+	r = (*Typelib)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *BaseInfo) IsDeprecated() (r bool) {
+	cr := C.gi_base_info_is_deprecated(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *BaseInfo) IterateAttributes(iterator *AttributeIter) (name string, value string, r bool) {
+	arg0 := (*C.GIAttributeIter)(unsafe.Pointer(iterator))
+	var arg1 *C.char
+	var arg2 *C.char
+	cr := C.gi_base_info_iterate_attributes(s.c(), arg0, &arg1, &arg2)
+	name = C.GoString(arg1)
+	value = C.GoString(arg2)
+	r = cr != 0
+	return
+}
+
+func (s *BaseInfo) Ref() (r *BaseInfo) {
+	cr := C.gi_base_info_ref(unsafe.Pointer(s.c()))
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *BaseInfo) Unref() {
+	C.gi_base_info_unref(unsafe.Pointer(s.c()))
+	return
+}
+
 type BaseInfoStack struct {
 	_ structs.HostLayout
 	_ [96]byte
@@ -113,6 +262,134 @@ func (obj *CallableInfo) c() *C.GICallableInfo {
 
 func (obj *CallableInfo) AsGICallableInfo() *CallableInfo {
 	return obj
+}
+
+func (s *CallableInfo) CanThrowGerror() (r bool) {
+	cr := C.gi_callable_info_can_throw_gerror(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *CallableInfo) GetArg(n uint32) (r *ArgInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_callable_info_get_arg(s.c(), arg0)
+	r = (*ArgInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *CallableInfo) GetAsyncFunction() (r *CallableInfo) {
+	cr := C.gi_callable_info_get_async_function(s.c())
+	r = (*CallableInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *CallableInfo) GetCallerOwns() (r Transfer) {
+	cr := C.gi_callable_info_get_caller_owns(s.c())
+	r = Transfer(cr)
+	return
+}
+
+func (s *CallableInfo) GetFinishFunction() (r *CallableInfo) {
+	cr := C.gi_callable_info_get_finish_function(s.c())
+	r = (*CallableInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *CallableInfo) GetInstanceOwnershipTransfer() (r Transfer) {
+	cr := C.gi_callable_info_get_instance_ownership_transfer(s.c())
+	r = Transfer(cr)
+	return
+}
+
+func (s *CallableInfo) GetNArgs() (r uint32) {
+	cr := C.gi_callable_info_get_n_args(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *CallableInfo) GetReturnAttribute(name string) (r string) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_callable_info_get_return_attribute(s.c(), arg0)
+	r = C.GoString(cr)
+	return
+}
+
+func (s *CallableInfo) GetReturnType() (r *TypeInfo) {
+	cr := C.gi_callable_info_get_return_type(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *CallableInfo) GetSyncFunction() (r *CallableInfo) {
+	cr := C.gi_callable_info_get_sync_function(s.c())
+	r = (*CallableInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *CallableInfo) Invoke(function unsafe.Pointer, in_args []Argument, n_in_args uint64, out_args []Argument, n_out_args uint64) (return_value Argument, r bool, err error) {
+	arg0 := (unsafe.Pointer)(function)
+	arg1 := (*C.GIArgument)(unsafe.Pointer(unsafe.SliceData(in_args)))
+	arg2 := (C.size_t)(n_in_args)
+	arg3 := (*C.GIArgument)(unsafe.Pointer(unsafe.SliceData(out_args)))
+	arg4 := (C.size_t)(n_out_args)
+	var arg5 C.GIArgument
+	var gerr *C.GError
+	cr := C.gi_callable_info_invoke(s.c(), arg0, arg1, arg2, arg3, arg4, &arg5, &gerr)
+	return_value = *(*Argument)(unsafe.Pointer(&arg5))
+	r = cr != 0
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
+}
+
+func (s *CallableInfo) IsAsync() (r bool) {
+	cr := C.gi_callable_info_is_async(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *CallableInfo) IsMethod() (r bool) {
+	cr := C.gi_callable_info_is_method(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *CallableInfo) IterateReturnAttributes(iterator *AttributeIter) (name string, value string, r bool) {
+	arg0 := (*C.GIAttributeIter)(unsafe.Pointer(iterator))
+	var arg1 *C.char
+	var arg2 *C.char
+	cr := C.gi_callable_info_iterate_return_attributes(s.c(), arg0, &arg1, &arg2)
+	name = C.GoString(arg1)
+	value = C.GoString(arg2)
+	r = cr != 0
+	return
+}
+
+func (s *CallableInfo) LoadArg(n uint32) (arg ArgInfo) {
+	arg0 := (C.uint)(n)
+	var arg1 C.GIArgInfo
+	C.gi_callable_info_load_arg(s.c(), arg0, &arg1)
+	arg = *(*ArgInfo)(unsafe.Pointer(&arg1))
+	return
+}
+
+func (s *CallableInfo) LoadReturnType() (_type TypeInfo) {
+	var arg0 C.GITypeInfo
+	C.gi_callable_info_load_return_type(s.c(), &arg0)
+	_type = *(*TypeInfo)(unsafe.Pointer(&arg0))
+	return
+}
+
+func (s *CallableInfo) MayReturnNull() (r bool) {
+	cr := C.gi_callable_info_may_return_null(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *CallableInfo) SkipReturn() (r bool) {
+	cr := C.gi_callable_info_skip_return(s.c())
+	r = cr != 0
+	return
 }
 
 var TypeCallbackInfo = g.Type[CallbackInfo](C.gi_callback_info_get_type())
@@ -143,6 +420,12 @@ func (obj *ConstantInfo) c() *C.GIConstantInfo {
 
 func (obj *ConstantInfo) AsGIConstantInfo() *ConstantInfo {
 	return obj
+}
+
+func (s *ConstantInfo) GetTypeInfo() (r *TypeInfo) {
+	cr := C.gi_constant_info_get_type_info(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
 }
 
 type Direction int64
@@ -189,6 +472,44 @@ func (obj *EnumInfo) AsGIEnumInfo() *EnumInfo {
 	return obj
 }
 
+func (s *EnumInfo) GetErrorDomain() (r string) {
+	cr := C.gi_enum_info_get_error_domain(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *EnumInfo) GetMethod(n uint32) (r *FunctionInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_enum_info_get_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *EnumInfo) GetNMethods() (r uint32) {
+	cr := C.gi_enum_info_get_n_methods(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *EnumInfo) GetNValues() (r uint32) {
+	cr := C.gi_enum_info_get_n_values(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *EnumInfo) GetStorageType() (r TypeTag) {
+	cr := C.gi_enum_info_get_storage_type(s.c())
+	r = TypeTag(cr)
+	return
+}
+
+func (s *EnumInfo) GetValue(n uint32) (r *ValueInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_enum_info_get_value(s.c(), arg0)
+	r = (*ValueInfo)(unsafe.Pointer(cr))
+	return
+}
+
 var TypeFieldInfo = g.Type[FieldInfo](C.gi_field_info_get_type())
 
 type FieldInfo struct {
@@ -202,6 +523,30 @@ func (obj *FieldInfo) c() *C.GIFieldInfo {
 
 func (obj *FieldInfo) AsGIFieldInfo() *FieldInfo {
 	return obj
+}
+
+func (s *FieldInfo) GetFlags() (r FieldInfoFlags) {
+	cr := C.gi_field_info_get_flags(s.c())
+	r = FieldInfoFlags(cr)
+	return
+}
+
+func (s *FieldInfo) GetOffset() (r uint64) {
+	cr := C.gi_field_info_get_offset(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *FieldInfo) GetSize() (r uint64) {
+	cr := C.gi_field_info_get_size(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *FieldInfo) GetTypeInfo() (r *TypeInfo) {
+	cr := C.gi_field_info_get_type_info(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
 }
 
 type FieldInfoFlags int64
@@ -259,6 +604,30 @@ func (obj *FunctionInfo) c() *C.GIFunctionInfo {
 
 func (obj *FunctionInfo) AsGIFunctionInfo() *FunctionInfo {
 	return obj
+}
+
+func (s *FunctionInfo) GetFlags() (r FunctionInfoFlags) {
+	cr := C.gi_function_info_get_flags(s.c())
+	r = FunctionInfoFlags(cr)
+	return
+}
+
+func (s *FunctionInfo) GetProperty() (r *PropertyInfo) {
+	cr := C.gi_function_info_get_property(s.c())
+	r = (*PropertyInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *FunctionInfo) GetSymbol() (r string) {
+	cr := C.gi_function_info_get_symbol(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *FunctionInfo) GetVfunc() (r *VFuncInfo) {
+	cr := C.gi_function_info_get_vfunc(s.c())
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
 }
 
 type FunctionInfoFlags int64
@@ -323,6 +692,114 @@ func (obj *InterfaceInfo) AsGIInterfaceInfo() *InterfaceInfo {
 	return obj
 }
 
+func (s *InterfaceInfo) FindMethod(name string) (r *FunctionInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_interface_info_find_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) FindSignal(name string) (r *SignalInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_interface_info_find_signal(s.c(), arg0)
+	r = (*SignalInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) FindVfunc(name string) (r *VFuncInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_interface_info_find_vfunc(s.c(), arg0)
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetConstant(n uint32) (r *ConstantInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_constant(s.c(), arg0)
+	r = (*ConstantInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetIfaceStruct() (r *StructInfo) {
+	cr := C.gi_interface_info_get_iface_struct(s.c())
+	r = (*StructInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetMethod(n uint32) (r *FunctionInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetNConstants() (r uint32) {
+	cr := C.gi_interface_info_get_n_constants(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetNMethods() (r uint32) {
+	cr := C.gi_interface_info_get_n_methods(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetNPrerequisites() (r uint32) {
+	cr := C.gi_interface_info_get_n_prerequisites(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetNProperties() (r uint32) {
+	cr := C.gi_interface_info_get_n_properties(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetNSignals() (r uint32) {
+	cr := C.gi_interface_info_get_n_signals(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetNVfuncs() (r uint32) {
+	cr := C.gi_interface_info_get_n_vfuncs(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *InterfaceInfo) GetPrerequisite(n uint32) (r *BaseInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_prerequisite(s.c(), arg0)
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetProperty(n uint32) (r *PropertyInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_property(s.c(), arg0)
+	r = (*PropertyInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetSignal(n uint32) (r *SignalInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_signal(s.c(), arg0)
+	r = (*SignalInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *InterfaceInfo) GetVfunc(n uint32) (r *VFuncInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_interface_info_get_vfunc(s.c(), arg0)
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
 type InvokeError int64
 
 const (
@@ -367,6 +844,207 @@ func (obj *ObjectInfo) AsGIObjectInfo() *ObjectInfo {
 	return obj
 }
 
+func (s *ObjectInfo) FindMethod(name string) (r *FunctionInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_object_info_find_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) FindMethodUsingInterfaces(name string) (declarer *BaseInfo, r *FunctionInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 *C.GIBaseInfo
+	cr := C.gi_object_info_find_method_using_interfaces(s.c(), arg0, &arg1)
+	declarer = (*BaseInfo)(unsafe.Pointer(arg1))
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) FindSignal(name string) (r *SignalInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_object_info_find_signal(s.c(), arg0)
+	r = (*SignalInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) FindVfunc(name string) (r *VFuncInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_object_info_find_vfunc(s.c(), arg0)
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) FindVfuncUsingInterfaces(name string) (declarer *BaseInfo, r *VFuncInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 *C.GIBaseInfo
+	cr := C.gi_object_info_find_vfunc_using_interfaces(s.c(), arg0, &arg1)
+	declarer = (*BaseInfo)(unsafe.Pointer(arg1))
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetAbstract() (r bool) {
+	cr := C.gi_object_info_get_abstract(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ObjectInfo) GetClassStruct() (r *StructInfo) {
+	cr := C.gi_object_info_get_class_struct(s.c())
+	r = (*StructInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetConstant(n uint32) (r *ConstantInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_constant(s.c(), arg0)
+	r = (*ConstantInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetField(n uint32) (r *FieldInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_field(s.c(), arg0)
+	r = (*FieldInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetFinal() (r bool) {
+	cr := C.gi_object_info_get_final(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ObjectInfo) GetFundamental() (r bool) {
+	cr := C.gi_object_info_get_fundamental(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *ObjectInfo) GetGetValueFunctionName() (r string) {
+	cr := C.gi_object_info_get_get_value_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetInterface(n uint32) (r *InterfaceInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_interface(s.c(), arg0)
+	r = (*InterfaceInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetMethod(n uint32) (r *FunctionInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetNConstants() (r uint32) {
+	cr := C.gi_object_info_get_n_constants(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNFields() (r uint32) {
+	cr := C.gi_object_info_get_n_fields(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNInterfaces() (r uint32) {
+	cr := C.gi_object_info_get_n_interfaces(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNMethods() (r uint32) {
+	cr := C.gi_object_info_get_n_methods(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNProperties() (r uint32) {
+	cr := C.gi_object_info_get_n_properties(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNSignals() (r uint32) {
+	cr := C.gi_object_info_get_n_signals(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetNVfuncs() (r uint32) {
+	cr := C.gi_object_info_get_n_vfuncs(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *ObjectInfo) GetParent() (r *ObjectInfo) {
+	cr := C.gi_object_info_get_parent(s.c())
+	r = (*ObjectInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetProperty(n uint32) (r *PropertyInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_property(s.c(), arg0)
+	r = (*PropertyInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetRefFunctionName() (r string) {
+	cr := C.gi_object_info_get_ref_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetSetValueFunctionName() (r string) {
+	cr := C.gi_object_info_get_set_value_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetSignal(n uint32) (r *SignalInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_signal(s.c(), arg0)
+	r = (*SignalInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *ObjectInfo) GetTypeInitFunctionName() (r string) {
+	cr := C.gi_object_info_get_type_init_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetTypeName() (r string) {
+	cr := C.gi_object_info_get_type_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetUnrefFunctionName() (r string) {
+	cr := C.gi_object_info_get_unref_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *ObjectInfo) GetVfunc(n uint32) (r *VFuncInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_object_info_get_vfunc(s.c(), arg0)
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
 var TypePropertyInfo = g.Type[PropertyInfo](C.gi_property_info_get_type())
 
 type PropertyInfo struct {
@@ -380,6 +1058,36 @@ func (obj *PropertyInfo) c() *C.GIPropertyInfo {
 
 func (obj *PropertyInfo) AsGIPropertyInfo() *PropertyInfo {
 	return obj
+}
+
+func (s *PropertyInfo) GetFlags() (r g.ParamFlags) {
+	cr := C.gi_property_info_get_flags(s.c())
+	r = g.ParamFlags(cr)
+	return
+}
+
+func (s *PropertyInfo) GetGetter() (r *FunctionInfo) {
+	cr := C.gi_property_info_get_getter(s.c())
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *PropertyInfo) GetOwnershipTransfer() (r Transfer) {
+	cr := C.gi_property_info_get_ownership_transfer(s.c())
+	r = Transfer(cr)
+	return
+}
+
+func (s *PropertyInfo) GetSetter() (r *FunctionInfo) {
+	cr := C.gi_property_info_get_setter(s.c())
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *PropertyInfo) GetTypeInfo() (r *TypeInfo) {
+	cr := C.gi_property_info_get_type_info(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
 }
 
 var TypeRegisteredTypeInfo = g.Type[RegisteredTypeInfo](C.gi_registered_type_info_get_type())
@@ -397,6 +1105,30 @@ func (obj *RegisteredTypeInfo) AsGIRegisteredTypeInfo() *RegisteredTypeInfo {
 	return obj
 }
 
+func (s *RegisteredTypeInfo) GetGType() (r g.Type[g.TypeInstance]) {
+	cr := C.gi_registered_type_info_get_g_type(s.c())
+	r = (g.Type[g.TypeInstance])(cr)
+	return
+}
+
+func (s *RegisteredTypeInfo) GetTypeInitFunctionName() (r string) {
+	cr := C.gi_registered_type_info_get_type_init_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *RegisteredTypeInfo) GetTypeName() (r string) {
+	cr := C.gi_registered_type_info_get_type_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *RegisteredTypeInfo) IsBoxed() (r bool) {
+	cr := C.gi_registered_type_info_is_boxed(s.c())
+	r = cr != 0
+	return
+}
+
 var TypeRepository = g.Type[Repository](C.gi_repository_get_type())
 
 type Repository struct {
@@ -411,6 +1143,228 @@ func (obj *Repository) c() *C.GIRepository {
 
 func (obj *Repository) AsGIRepository() *Repository {
 	return obj
+}
+
+func RepositoryNew() (r *Repository) {
+	cr := C.gi_repository_new()
+	r = (*Repository)(unsafe.Pointer(cr))
+	return
+}
+
+func RepositoryDump(input_filename string, output_filename string) (r bool, err error) {
+	arg0 := C.CString(input_filename)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := C.CString(output_filename)
+	defer C.free(unsafe.Pointer(arg1))
+	var gerr *C.GError
+	cr := C.gi_repository_dump(arg0, arg1, &gerr)
+	r = cr != 0
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
+}
+
+func RepositoryErrorQuark() (r uint32) {
+	cr := C.gi_repository_error_quark()
+	r = (uint32)(cr)
+	return
+}
+
+func RepositoryGetOptionGroup() (r *g.OptionGroup) {
+	cr := C.gi_repository_get_option_group()
+	r = (*g.OptionGroup)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) EnumerateVersions(namespace_ string) (n_versions_out uint64, r []string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 C.size_t
+	C.gi_repository_enumerate_versions(s.c(), arg0, &arg1)
+	n_versions_out = (uint64)(arg1)
+	return
+}
+
+func (s *Repository) FindByErrorDomain(domain uint32) (r *EnumInfo) {
+	arg0 := (C.uint)(domain)
+	cr := C.gi_repository_find_by_error_domain(s.c(), arg0)
+	r = (*EnumInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) FindByGtype(gtype g.Type[g.TypeInstance]) (r *BaseInfo) {
+	arg0 := (C.GType)(gtype)
+	cr := C.gi_repository_find_by_gtype(s.c(), arg0)
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) FindByName(namespace_ string, name string) (r *BaseInfo) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg1))
+	cr := C.gi_repository_find_by_name(s.c(), arg0, arg1)
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) GetCPrefix(namespace_ string) (r string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_repository_get_c_prefix(s.c(), arg0)
+	r = C.GoString(cr)
+	return
+}
+
+func (s *Repository) GetDependencies(namespace_ string) (n_dependencies_out uint64, r []string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 C.size_t
+	C.gi_repository_get_dependencies(s.c(), arg0, &arg1)
+	n_dependencies_out = (uint64)(arg1)
+	return
+}
+
+func (s *Repository) GetImmediateDependencies(namespace_ string) (n_dependencies_out uint64, r []string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 C.size_t
+	C.gi_repository_get_immediate_dependencies(s.c(), arg0, &arg1)
+	n_dependencies_out = (uint64)(arg1)
+	return
+}
+
+func (s *Repository) GetInfo(namespace_ string, idx uint32) (r *BaseInfo) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := (C.uint)(idx)
+	cr := C.gi_repository_get_info(s.c(), arg0, arg1)
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) GetLibraryPath() (n_paths_out uint64, r []string) {
+	var arg0 C.size_t
+	C.gi_repository_get_library_path(s.c(), &arg0)
+	n_paths_out = (uint64)(arg0)
+	return
+}
+
+func (s *Repository) GetLoadedNamespaces() (n_namespaces_out uint64, r []string) {
+	var arg0 C.size_t
+	C.gi_repository_get_loaded_namespaces(s.c(), &arg0)
+	n_namespaces_out = (uint64)(arg0)
+	return
+}
+
+func (s *Repository) GetNInfos(namespace_ string) (r uint32) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_repository_get_n_infos(s.c(), arg0)
+	r = (uint32)(cr)
+	return
+}
+
+func (s *Repository) GetObjectGtypeInterfaces(gtype g.Type[g.TypeInstance]) (n_interfaces_out uint64, interfaces_out []*InterfaceInfo) {
+	arg0 := (C.GType)(gtype)
+	var arg1 C.size_t
+	var arg2 **C.GIInterfaceInfo
+	C.gi_repository_get_object_gtype_interfaces(s.c(), arg0, &arg1, &arg2)
+	n_interfaces_out = (uint64)(arg1)
+	return
+}
+
+func (s *Repository) GetSearchPath() (n_paths_out uint64, r []string) {
+	var arg0 C.size_t
+	C.gi_repository_get_search_path(s.c(), &arg0)
+	n_paths_out = (uint64)(arg0)
+	return
+}
+
+func (s *Repository) GetSharedLibraries(namespace_ string) (out_n_elements uint64, r []string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	var arg1 C.size_t
+	C.gi_repository_get_shared_libraries(s.c(), arg0, &arg1)
+	out_n_elements = (uint64)(arg1)
+	return
+}
+
+func (s *Repository) GetTypelibPath(namespace_ string) (r string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_repository_get_typelib_path(s.c(), arg0)
+	r = C.GoString(cr)
+	return
+}
+
+func (s *Repository) GetVersion(namespace_ string) (r string) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_repository_get_version(s.c(), arg0)
+	r = C.GoString(cr)
+	return
+}
+
+func (s *Repository) IsRegistered(namespace_ string, version string) (r bool) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := C.CString(version)
+	defer C.free(unsafe.Pointer(arg1))
+	cr := C.gi_repository_is_registered(s.c(), arg0, arg1)
+	r = cr != 0
+	return
+}
+
+func (s *Repository) LoadTypelib(typelib *Typelib, flags RepositoryLoadFlags) (r string, err error) {
+	arg0 := (*C.GITypelib)(unsafe.Pointer(typelib))
+	arg1 := C.GIRepositoryLoadFlags(flags)
+	var gerr *C.GError
+	cr := C.gi_repository_load_typelib(s.c(), arg0, arg1, &gerr)
+	r = C.GoString(cr)
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
+}
+
+func (s *Repository) PrependLibraryPath(directory string) {
+	arg0 := C.CString(directory)
+	defer C.free(unsafe.Pointer(arg0))
+	C.gi_repository_prepend_library_path(s.c(), arg0)
+	return
+}
+
+func (s *Repository) PrependSearchPath(directory string) {
+	arg0 := C.CString(directory)
+	defer C.free(unsafe.Pointer(arg0))
+	C.gi_repository_prepend_search_path(s.c(), arg0)
+	return
+}
+
+func (s *Repository) Require(namespace_ string, version string, flags RepositoryLoadFlags) (r *Typelib, err error) {
+	arg0 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := C.CString(version)
+	defer C.free(unsafe.Pointer(arg1))
+	arg2 := C.GIRepositoryLoadFlags(flags)
+	var gerr *C.GError
+	cr := C.gi_repository_require(s.c(), arg0, arg1, arg2, &gerr)
+	r = (*Typelib)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *Repository) RequirePrivate(typelib_dir string, namespace_ string, version string, flags RepositoryLoadFlags) (r *Typelib, err error) {
+	arg0 := C.CString(typelib_dir)
+	defer C.free(unsafe.Pointer(arg0))
+	arg1 := C.CString(namespace_)
+	defer C.free(unsafe.Pointer(arg1))
+	arg2 := C.CString(version)
+	defer C.free(unsafe.Pointer(arg2))
+	arg3 := C.GIRepositoryLoadFlags(flags)
+	var gerr *C.GError
+	cr := C.gi_repository_require_private(s.c(), arg0, arg1, arg2, arg3, &gerr)
+	r = (*Typelib)(unsafe.Pointer(cr))
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
 }
 
 type RepositoryError int64
@@ -525,6 +1479,24 @@ func (obj *SignalInfo) AsGISignalInfo() *SignalInfo {
 	return obj
 }
 
+func (s *SignalInfo) GetClassClosure() (r *VFuncInfo) {
+	cr := C.gi_signal_info_get_class_closure(s.c())
+	r = (*VFuncInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *SignalInfo) GetFlags() (r g.SignalFlags) {
+	cr := C.gi_signal_info_get_flags(s.c())
+	r = g.SignalFlags(cr)
+	return
+}
+
+func (s *SignalInfo) TrueStopsEmit() (r bool) {
+	cr := C.gi_signal_info_true_stops_emit(s.c())
+	r = cr != 0
+	return
+}
+
 var TypeStructInfo = g.Type[StructInfo](C.gi_struct_info_get_type())
 
 type StructInfo struct {
@@ -538,6 +1510,84 @@ func (obj *StructInfo) c() *C.GIStructInfo {
 
 func (obj *StructInfo) AsGIStructInfo() *StructInfo {
 	return obj
+}
+
+func (s *StructInfo) FindField(name string) (r *FieldInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_struct_info_find_field(s.c(), arg0)
+	r = (*FieldInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *StructInfo) FindMethod(name string) (r *FunctionInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_struct_info_find_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *StructInfo) GetAlignment() (r uint64) {
+	cr := C.gi_struct_info_get_alignment(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *StructInfo) GetCopyFunctionName() (r string) {
+	cr := C.gi_struct_info_get_copy_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *StructInfo) GetField(n uint32) (r *FieldInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_struct_info_get_field(s.c(), arg0)
+	r = (*FieldInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *StructInfo) GetFreeFunctionName() (r string) {
+	cr := C.gi_struct_info_get_free_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *StructInfo) GetMethod(n uint32) (r *FunctionInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_struct_info_get_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *StructInfo) GetNFields() (r uint32) {
+	cr := C.gi_struct_info_get_n_fields(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *StructInfo) GetNMethods() (r uint32) {
+	cr := C.gi_struct_info_get_n_methods(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *StructInfo) GetSize() (r uint64) {
+	cr := C.gi_struct_info_get_size(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *StructInfo) IsForeign() (r bool) {
+	cr := C.gi_struct_info_is_foreign(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *StructInfo) IsGtypeStruct() (r bool) {
+	cr := C.gi_struct_info_is_gtype_struct(s.c())
+	r = cr != 0
+	return
 }
 
 const TypeTagNTypes = "NOT IMPLEMENTED"
@@ -585,6 +1635,79 @@ func (obj *TypeInfo) c() *C.GITypeInfo {
 
 func (obj *TypeInfo) AsGITypeInfo() *TypeInfo {
 	return obj
+}
+
+func (s *TypeInfo) ArgumentFromHashPointer(hash_pointer unsafe.Pointer) (arg Argument) {
+	arg0 := (unsafe.Pointer)(hash_pointer)
+	var arg1 C.GIArgument
+	C.gi_type_info_argument_from_hash_pointer(s.c(), arg0, &arg1)
+	arg = *(*Argument)(unsafe.Pointer(&arg1))
+	return
+}
+
+func (s *TypeInfo) GetArrayFixedSize() (out_size uint64, r bool) {
+	var arg0 C.size_t
+	cr := C.gi_type_info_get_array_fixed_size(s.c(), &arg0)
+	out_size = (uint64)(arg0)
+	r = cr != 0
+	return
+}
+
+func (s *TypeInfo) GetArrayLengthIndex() (out_length_index uint32, r bool) {
+	var arg0 C.uint
+	cr := C.gi_type_info_get_array_length_index(s.c(), &arg0)
+	out_length_index = (uint32)(arg0)
+	r = cr != 0
+	return
+}
+
+func (s *TypeInfo) GetArrayType() (r ArrayType) {
+	cr := C.gi_type_info_get_array_type(s.c())
+	r = ArrayType(cr)
+	return
+}
+
+func (s *TypeInfo) GetInterface() (r *BaseInfo) {
+	cr := C.gi_type_info_get_interface(s.c())
+	r = (*BaseInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *TypeInfo) GetParamType(n uint32) (r *TypeInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_type_info_get_param_type(s.c(), arg0)
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *TypeInfo) GetStorageType() (r TypeTag) {
+	cr := C.gi_type_info_get_storage_type(s.c())
+	r = TypeTag(cr)
+	return
+}
+
+func (s *TypeInfo) GetTag() (r TypeTag) {
+	cr := C.gi_type_info_get_tag(s.c())
+	r = TypeTag(cr)
+	return
+}
+
+func (s *TypeInfo) HashPointerFromArgument(arg *Argument) {
+	arg0 := (*C.GIArgument)(unsafe.Pointer(arg))
+	C.gi_type_info_hash_pointer_from_argument(s.c(), arg0)
+	return
+}
+
+func (s *TypeInfo) IsPointer() (r bool) {
+	cr := C.gi_type_info_is_pointer(s.c())
+	r = cr != 0
+	return
+}
+
+func (s *TypeInfo) IsZeroTerminated() (r bool) {
+	cr := C.gi_type_info_is_zero_terminated(s.c())
+	r = cr != 0
+	return
 }
 
 type TypeTag int64
@@ -771,6 +1894,91 @@ func (obj *UnionInfo) AsGIUnionInfo() *UnionInfo {
 	return obj
 }
 
+func (s *UnionInfo) FindMethod(name string) (r *FunctionInfo) {
+	arg0 := C.CString(name)
+	defer C.free(unsafe.Pointer(arg0))
+	cr := C.gi_union_info_find_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *UnionInfo) GetAlignment() (r uint64) {
+	cr := C.gi_union_info_get_alignment(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *UnionInfo) GetCopyFunctionName() (r string) {
+	cr := C.gi_union_info_get_copy_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *UnionInfo) GetDiscriminator(n uint64) (r *ConstantInfo) {
+	arg0 := (C.size_t)(n)
+	cr := C.gi_union_info_get_discriminator(s.c(), arg0)
+	r = (*ConstantInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *UnionInfo) GetDiscriminatorOffset() (out_offset uint64, r bool) {
+	var arg0 C.size_t
+	cr := C.gi_union_info_get_discriminator_offset(s.c(), &arg0)
+	out_offset = (uint64)(arg0)
+	r = cr != 0
+	return
+}
+
+func (s *UnionInfo) GetDiscriminatorType() (r *TypeInfo) {
+	cr := C.gi_union_info_get_discriminator_type(s.c())
+	r = (*TypeInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *UnionInfo) GetField(n uint32) (r *FieldInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_union_info_get_field(s.c(), arg0)
+	r = (*FieldInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *UnionInfo) GetFreeFunctionName() (r string) {
+	cr := C.gi_union_info_get_free_function_name(s.c())
+	r = C.GoString(cr)
+	return
+}
+
+func (s *UnionInfo) GetMethod(n uint32) (r *FunctionInfo) {
+	arg0 := (C.uint)(n)
+	cr := C.gi_union_info_get_method(s.c(), arg0)
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *UnionInfo) GetNFields() (r uint32) {
+	cr := C.gi_union_info_get_n_fields(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *UnionInfo) GetNMethods() (r uint32) {
+	cr := C.gi_union_info_get_n_methods(s.c())
+	r = (uint32)(cr)
+	return
+}
+
+func (s *UnionInfo) GetSize() (r uint64) {
+	cr := C.gi_union_info_get_size(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *UnionInfo) IsDiscriminated() (r bool) {
+	cr := C.gi_union_info_is_discriminated(s.c())
+	r = cr != 0
+	return
+}
+
 var TypeUnresolvedInfo = g.Type[UnresolvedInfo](C.gi_unresolved_info_get_type())
 
 type UnresolvedInfo struct {
@@ -800,6 +2008,38 @@ func (obj *VFuncInfo) c() *C.GIVFuncInfo {
 
 func (obj *VFuncInfo) AsGIVFuncInfo() *VFuncInfo {
 	return obj
+}
+
+func (s *VFuncInfo) GetAddress(implementor_gtype g.Type[g.TypeInstance]) (err error) {
+	arg0 := (C.GType)(implementor_gtype)
+	var gerr *C.GError
+	C.gi_vfunc_info_get_address(s.c(), arg0, &gerr)
+	err = (*g.Error)(unsafe.Pointer(gerr))
+	return
+}
+
+func (s *VFuncInfo) GetFlags() (r VFuncInfoFlags) {
+	cr := C.gi_vfunc_info_get_flags(s.c())
+	r = VFuncInfoFlags(cr)
+	return
+}
+
+func (s *VFuncInfo) GetInvoker() (r *FunctionInfo) {
+	cr := C.gi_vfunc_info_get_invoker(s.c())
+	r = (*FunctionInfo)(unsafe.Pointer(cr))
+	return
+}
+
+func (s *VFuncInfo) GetOffset() (r uint64) {
+	cr := C.gi_vfunc_info_get_offset(s.c())
+	r = (uint64)(cr)
+	return
+}
+
+func (s *VFuncInfo) GetSignal() (r *SignalInfo) {
+	cr := C.gi_vfunc_info_get_signal(s.c())
+	r = (*SignalInfo)(unsafe.Pointer(cr))
+	return
 }
 
 type VFuncInfoFlags int64
@@ -847,4 +2087,10 @@ func (obj *ValueInfo) c() *C.GIValueInfo {
 
 func (obj *ValueInfo) AsGIValueInfo() *ValueInfo {
 	return obj
+}
+
+func (s *ValueInfo) GetValue() (r int64) {
+	cr := C.gi_value_info_get_value(s.c())
+	r = (int64)(cr)
+	return
 }
