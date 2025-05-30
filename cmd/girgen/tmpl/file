@@ -13,6 +13,10 @@ import "C"
 import()
 
 {{range $_, $info := (.Repo.GetInfos .Config.Namespace)}}
+	{{if $.Config.Skip.Contains $info.GetName}}
+		{{continue}}
+	{{end}}
+
 	{{with toStruct $info}}
 		{{$.Generate "struct" . nil}}
 	{{end}}
